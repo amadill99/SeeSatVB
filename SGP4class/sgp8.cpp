@@ -30,7 +30,7 @@
 // -----------------------------------------------------------------------------------------------
 
 #include <math.h>
-#include <string.h>
+#include "stdafx.h"
 #include "norad.h"
 #include "norad_in.h"
 

@@ -17,11 +17,11 @@ namespace SGP4space
 		if (model == SGP4M)
 			SGP4_init(params, tle);
 		/*else if (model == SGP8M)
-		SGP8(tsince, tle, params, pos, vel);*/
+		SGP8_init(params, tle);*/
 		else if (model == SDP4M)
 			SDP4_init(params, tle);
 		/*else if (model == SDP8M)
-		SDP8(tsince, tle, params, pos, vel);*/
+		SDP8_init(params, tle);*/
 		
 	}
 
@@ -32,11 +32,11 @@ namespace SGP4space
 		if (model == SGP4M)
 			SGP4(tsince, tle, params, pos, vel);
 		/*else if (model == SGP8M)
-			SGP8(tsince, tle, params, pos, vel);*/
+			SGP8(tsince, tle, params, pos, vel);/**/
 		else if (model == SDP4M)
 			SDP4(tsince, tle, params, pos, vel);
 		/*else if (model == SDP8M)
-			SDP8(tsince, tle, params, pos, vel);*/
+			SDP8(tsince, tle, params, pos, vel);/**/
 		else return -1;
 		
 		return 0;
