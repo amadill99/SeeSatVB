@@ -12,7 +12,8 @@ Public Class SatWindow
     Public Shared MJITTER As Integer = 4        ' the maximum amount the mouse can move just sitting there
 
     ' the projection to use
-    Public Shared VIEWSTEREO As Boolean = False ' use sterographic projection
+    'Public Shared VIEWSTEREO As Boolean = False ' use sterographic projection
+    Public Shared VIEWSTEREO As Boolean = SeeSatVBmain.my_params.view_stereo ' use sterographic projection
 
     'Public Shared pbgr As Graphics = SatWindow.CanvasPBox.CreateGraphics
     Public Shared grMatrix As System.Drawing.Drawing2D.Matrix

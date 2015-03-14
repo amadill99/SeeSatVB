@@ -21,7 +21,7 @@
       <Value Profile="(Default)">E:\Source\Satellite\Data\hipstarcat.csv</Value>
     </Setting>
     <Setting Name="user_mcnames_path" Type="System.String" Scope="User">
-      <Value Profile="(Default)">E:\Source\Satellite\Data\mcnames</Value>
+      <Value Profile="(Default)">E:\Source\Satellite\Data\mcnames.txt</Value>
     </Setting>
     <Setting Name="user_qsat_path" Type="System.String" Scope="User">
       <Value Profile="(Default)">E:\Source\Satellite\Data\qs.mag.txt</Value>

@@ -38,6 +38,7 @@ Partial Class SeeSatVBmain
         Me.TLEFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OptionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SaveDefaultsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.UserLocationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TimerS = New System.Windows.Forms.Timer(Me.components)
         Me.DateTimePickerRT = New System.Windows.Forms.DateTimePicker()
         Me.LabelRT = New System.Windows.Forms.Label()
@@ -46,7 +47,6 @@ Partial Class SeeSatVBmain
         Me.RadioButtonRT = New System.Windows.Forms.RadioButton()
         Me.GroupBoxTM = New System.Windows.Forms.GroupBox()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
-        Me.UserLocationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.GroupBoxTM.SuspendLayout()
         Me.SuspendLayout()
@@ -154,8 +154,14 @@ Partial Class SeeSatVBmain
         'SaveDefaultsToolStripMenuItem
         '
         Me.SaveDefaultsToolStripMenuItem.Name = "SaveDefaultsToolStripMenuItem"
-        Me.SaveDefaultsToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.SaveDefaultsToolStripMenuItem.Size = New System.Drawing.Size(146, 22)
         Me.SaveDefaultsToolStripMenuItem.Text = "Save Defaults"
+        '
+        'UserLocationToolStripMenuItem
+        '
+        Me.UserLocationToolStripMenuItem.Name = "UserLocationToolStripMenuItem"
+        Me.UserLocationToolStripMenuItem.Size = New System.Drawing.Size(146, 22)
+        Me.UserLocationToolStripMenuItem.Text = "User Location"
         '
         'TimerS
         '
@@ -163,6 +169,7 @@ Partial Class SeeSatVBmain
         'DateTimePickerRT
         '
         Me.DateTimePickerRT.CustomFormat = "MM/dd/yyyy - HH:mm:ss"
+        Me.DateTimePickerRT.Enabled = False
         Me.DateTimePickerRT.Format = System.Windows.Forms.DateTimePickerFormat.Custom
         Me.DateTimePickerRT.Location = New System.Drawing.Point(12, 426)
         Me.DateTimePickerRT.Name = "DateTimePickerRT"
@@ -172,6 +179,7 @@ Partial Class SeeSatVBmain
         'LabelRT
         '
         Me.LabelRT.AutoSize = True
+        Me.LabelRT.Enabled = False
         Me.LabelRT.Location = New System.Drawing.Point(12, 410)
         Me.LabelRT.Name = "LabelRT"
         Me.LabelRT.Size = New System.Drawing.Size(53, 13)
@@ -181,6 +189,7 @@ Partial Class SeeSatVBmain
         'CheckBoxUTC
         '
         Me.CheckBoxUTC.AutoSize = True
+        Me.CheckBoxUTC.Enabled = False
         Me.CheckBoxUTC.Location = New System.Drawing.Point(166, 429)
         Me.CheckBoxUTC.Name = "CheckBoxUTC"
         Me.CheckBoxUTC.Size = New System.Drawing.Size(48, 17)
@@ -214,6 +223,7 @@ Partial Class SeeSatVBmain
         '
         Me.GroupBoxTM.Controls.Add(Me.RadioButtonRT)
         Me.GroupBoxTM.Controls.Add(Me.RadioButtonPM)
+        Me.GroupBoxTM.Enabled = False
         Me.GroupBoxTM.Location = New System.Drawing.Point(12, 328)
         Me.GroupBoxTM.Name = "GroupBoxTM"
         Me.GroupBoxTM.Size = New System.Drawing.Size(89, 70)
@@ -226,12 +236,6 @@ Partial Class SeeSatVBmain
         Me.ImageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit
         Me.ImageList1.ImageSize = New System.Drawing.Size(16, 16)
         Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
-        '
-        'UserLocationToolStripMenuItem
-        '
-        Me.UserLocationToolStripMenuItem.Name = "UserLocationToolStripMenuItem"
-        Me.UserLocationToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.UserLocationToolStripMenuItem.Text = "User Location"
         '
         'SeeSatVBmain
         '

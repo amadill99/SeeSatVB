@@ -1033,9 +1033,9 @@ Public Class SeeSatVBmain
 
         ' do some checking on the return values for rval
         chk_rval(SatIO.ReadStars(my_files.star_path), my_files.star_path)
+        chk_rval(SatIO.ReadMcname(my_files.mcnames_path), my_files.mcnames_path)
         chk_rval(SatIO.ReadQsat(my_files.qsat_path), my_files.qsat_path)
         chk_rval(SatIO.ReadTLE(my_files.tle_path), my_files.tle_path)
-        chk_rval(SatIO.ReadStars(my_files.star_path), my_files.star_path)
 
     End Sub
 

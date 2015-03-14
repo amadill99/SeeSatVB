@@ -128,7 +128,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("E:\Source\Satellite\Data\mcnames")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("E:\Source\Satellite\Data\mcnames.txt")>  _
         Public Property user_mcnames_path() As String
             Get
                 Return CType(Me("user_mcnames_path"),String)
