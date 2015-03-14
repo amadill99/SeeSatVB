@@ -1,0 +1,15 @@
+﻿  stdafx.cpp
+  SGP4class.cpp
+  sgp4.cpp
+  sgp.cpp
+  sdp4.cpp
+  observe.cpp
+  get_el.cpp
+  dispatch.cpp
+  deep.cpp
+  common.cpp
+  basics.cpp
+  Generating Code...
+  dllmain.cpp
+     Creating library E:\Source\Satellite\VisualBasic\SeeSatVB\Debug\SGP4class.lib and object E:\Source\Satellite\VisualBasic\SeeSatVB\Debug\SGP4class.exp
+  SGP4class.vcxproj -> E:\Source\Satellite\VisualBasic\SeeSatVB\Debug\SGP4class.dll

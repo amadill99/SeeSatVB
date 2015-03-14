@@ -1,0 +1,45 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="My" GeneratedClassName="MySettings" UseMySettingsClassName="true">
+  <Profiles />
+  <Settings>
+    <Setting Name="user_lat" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">54</Value>
+    </Setting>
+    <Setting Name="user_lon" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">-124</Value>
+    </Setting>
+    <Setting Name="user_ht_in_meters" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">640</Value>
+    </Setting>
+    <Setting Name="user_rundate" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)">02/13/2015 18:40:00</Value>
+    </Setting>
+    <Setting Name="user_tz" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">-7</Value>
+    </Setting>
+    <Setting Name="user_star_path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">E:\Source\Satellite\Data\hipstarcat.csv</Value>
+    </Setting>
+    <Setting Name="user_mcnames_path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">E:\Source\Satellite\Data\mcnames</Value>
+    </Setting>
+    <Setting Name="user_qsat_path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">E:\Source\Satellite\Data\qs.mag.txt</Value>
+    </Setting>
+    <Setting Name="user_tle_path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">E:\Source\Satellite\Data\visual.txt</Value>
+    </Setting>
+    <Setting Name="user_loc_name" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Vanderhoof BC Canada</Value>
+    </Setting>
+    <Setting Name="user_star_int" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">10000</Value>
+    </Setting>
+    <Setting Name="user_sat_int" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1000</Value>
+    </Setting>
+    <Setting Name="user_view_stereo" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
