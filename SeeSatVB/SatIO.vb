@@ -1,5 +1,6 @@
 ﻿Imports System.IO
 Imports System.Runtime.InteropServices
+Imports System.Globalization
 
 
 Public Class SatIO
@@ -51,9 +52,9 @@ Public Class SatIO
                     'Next
                     'SeeSatVBmain.TextBox1.AppendText(vbNewLine)
 
-                    myStar.ra = CDbl(currentRow(0)) * DefConst.DE2RA
-                    myStar.dec = CDbl(currentRow(1)) * DefConst.DE2RA
-                    myStar.mag = CDbl(currentRow(2))
+                    myStar.ra = Double.Parse(currentRow(0), CultureInfo.InvariantCulture) * DefConst.DE2RA
+                    myStar.dec = Double.Parse(currentRow(1), CultureInfo.InvariantCulture) * DefConst.DE2RA
+                    myStar.mag = Double.Parse(currentRow(2), CultureInfo.InvariantCulture)
                     myStar.cosdec = Math.Cos(myStar.dec)
                     myStar.sindec = Math.Sin(myStar.dec)
 
@@ -65,13 +66,13 @@ Public Class SatIO
                     End If
 
                 Catch ex As Microsoft.VisualBasic.FileIO.MalformedLineException
-                    SeeSatVBmain.TextBox1.AppendText(ex.Message + "is not valid and will be skipped. " + vbNewLine)
+                    SeeSatVBmain.TextBox1.AppendText(ex.Message + " is not valid and will be skipped. " + vbNewLine)
                 Catch ex As System.IO.FileNotFoundException
                     SeeSatVBmain.TextBox1.AppendText(ex.Message + " File not found fatal error reading star data." + vbNewLine)
                     StarNdx = -1
                     Exit While
                 Catch ex As System.InvalidCastException
-                    SeeSatVBmain.TextBox1.AppendText(ex.Message + " File not found fatal error reading star data." + vbNewLine)
+                    SeeSatVBmain.TextBox1.AppendText(ex.Message + " Cast exception error reading star data." + vbNewLine)
                     StarNdx = -1
                     Exit While
                 End Try
@@ -84,7 +85,7 @@ Public Class SatIO
             ReDim stars(1)
             StarNdx = 0
         End If
-        
+
         SeeSatVBmain.TextBox1.AppendText("read " + CStr(StarNdx) + " stars." + vbNewLine)
 
         ReadStars = StarNdx
@@ -174,12 +175,12 @@ Public Class SatIO
                         tle0.satname = currentRow(1)
 
                         If rowType.Length >= 42 Then
-                            tle0.smag = str2sng(currentRow(5))   ' already molcazan magnitudes
-                            tle0.slength = str2sng(currentRow(2))
-                            tle0.swidth = str2sng(currentRow(3))
-                            tle0.sdepth = str2sng(currentRow(4))
+                            tle0.smag = Single.Parse(currentRow(5), CultureInfo.InvariantCulture)   ' already molcazan magnitudes
+                            tle0.slength = Single.Parse(currentRow(2), CultureInfo.InvariantCulture)
+                            tle0.swidth = Single.Parse(currentRow(3), CultureInfo.InvariantCulture)
+                            tle0.sdepth = Single.Parse(currentRow(4), CultureInfo.InvariantCulture)
                             If rowType.Length >= 48 Then
-                                tle0.rxsect = str2sng(currentRow(7))
+                                tle0.rxsect = Single.Parse(currentRow(7), CultureInfo.InvariantCulture)
                             Else
                                 tle0.rxsect = 0
                             End If
@@ -211,11 +212,11 @@ Public Class SatIO
                 Catch ex As Microsoft.VisualBasic.FileIO.MalformedLineException
                     SeeSatVBmain.TextBox1.AppendText(ex.Message + " and is invalid - skipping. " + vbNewLine)
                 Catch ex As System.InvalidCastException
-                    SeeSatVBmain.TextBox1.AppendText(ex.Message + " Fatal error reading visual data." + vbNewLine)
+                    SeeSatVBmain.TextBox1.AppendText(ex.Message + " Cast exception error reading mcnames data." + vbNewLine)
                     Tle0Ndx = -1
                     Exit While
                 Catch ex As System.IO.FileNotFoundException
-                    SeeSatVBmain.TextBox1.AppendText(ex.Message + " File not found fatal error reading TLE." + vbNewLine)
+                    SeeSatVBmain.TextBox1.AppendText(ex.Message + " File not found fatal error reading mcnames data." + vbNewLine)
                     Tle0Ndx = -1
                     Exit While
                 End Try
@@ -311,7 +312,7 @@ Public Class SatIO
 
                         ID = CInt(currentRow(0))
                         tle0.satname = currentRow(3)
-                        tle0.smag = CSng(str2sng(currentRow(4)) + 1.5)   ' convert to molcazan magnitudes
+                        tle0.smag = str2sng(currentRow(4)) + 1.5!   ' convert to molcazan magnitudes
                         If rowType.Length >= 38 Then
                             tle0.slength = str2sng(currentRow(5))
                             tle0.swidth = str2sng(currentRow(6))
@@ -355,11 +356,11 @@ Public Class SatIO
                 Catch ex As Microsoft.VisualBasic.FileIO.MalformedLineException
                     SeeSatVBmain.TextBox1.AppendText(ex.Message + " and is invalid - skipping. " + vbNewLine)
                 Catch ex As System.IO.FileNotFoundException
-                    SeeSatVBmain.TextBox1.AppendText(ex.Message + " File not found fatal error reading TLE." + vbNewLine)
+                    SeeSatVBmain.TextBox1.AppendText(ex.Message + " File not found fatal error reading quicksat data." + vbNewLine)
                     Tle0Ndx = -1
                     Exit While
                 Catch ex As InvalidCastException
-                    SeeSatVBmain.TextBox1.AppendText(ex.Message + " Fatal error reading TLE." + vbNewLine)
+                    SeeSatVBmain.TextBox1.AppendText(ex.Message + " Cast exception error reading quicksat data." + vbNewLine)
                     Tle0Ndx = -1
                     Exit While
                 End Try
@@ -376,7 +377,7 @@ Public Class SatIO
         ' convert a string to a single value, 0 if null
         Dim rval As Single = 0
         If s.Length > 0 Then
-            rval = CSng(s)
+            rval = Single.Parse(s, CultureInfo.InvariantCulture)
         End If
         str2sng = rval
     End Function
@@ -518,9 +519,9 @@ Public Class SatIO
                     End If
 
                 Catch ex As FileIO.MalformedLineException
-                    SeeSatVBmain.TextBox1.AppendText("error reading TLE element." + vbNewLine)
+                    SeeSatVBmain.TextBox1.AppendText(" error reading TLE element." + vbNewLine)
                 Catch ex As System.ArgumentOutOfRangeException
-                    SeeSatVBmain.TextBox1.AppendText(ex.Message + "Fatal error reading TLE." + vbNewLine)
+                    SeeSatVBmain.TextBox1.AppendText(ex.Message + " arg out of range error reading TLE." + vbNewLine)
                     tlecnt = -1
                     Exit While
                 Catch ex As System.IO.FileNotFoundException
@@ -531,6 +532,9 @@ Public Class SatIO
             End While
         End Using
         SeeSatVBmain.SatNdx = SeeSatVBmain.satellites.Length - 1
+
+        SeeSatVBmain.TextBox1.AppendText("Read " + CStr(tlecnt) + " elements." + vbNewLine)
+
         ReadTLE = tlecnt
     End Function
 
