@@ -1,4 +1,5 @@
 ﻿Imports System.Text.RegularExpressions
+Imports System.Globalization
 
 Public Class UserSettings
 
@@ -16,10 +17,10 @@ Public Class UserSettings
         loc_name = SeeSatVBmain.my_loc.loc_name
 
         TBLat.Text = CStr(SeeSatVBmain.my_loc.lat_deg)          '= My.Settings.user_lat
-        TBLatDisp.Text = Parser.DecDegToString(loc_lat, "N")
+        TBLatDisp.Text = Parser.DecDegToDMSString(loc_lat, "N")
         'SeeSatVBmain.my_loc.lat_rad = My.Settings.user_lat * DefConst.DE2RA
         TBLong.Text = CStr(SeeSatVBmain.my_loc.lon_deg)         '= My.Settings.user_lon
-        TBLongDisp.Text = Parser.DecDegToString(loc_lon, "E")
+        TBLongDisp.Text = Parser.DecDegToDMSString(loc_lon, "E")
         'SeeSatVBmain.my_loc.lon_rad = My.Settings.user_lon * DefConst.DE2RA
         TBElev.Text = CStr(SeeSatVBmain.my_loc.ht_in_meters)    '= My.Settings.user_ht_in_meters
         TBLName.Text = SeeSatVBmain.my_loc.loc_name              '= My.Settings.user_loc_name
@@ -30,7 +31,7 @@ Public Class UserSettings
     Private Sub TBLat_Leave(sender As Object, e As EventArgs) Handles TBLat.Leave
         Dim lat As Double
         lat = Parser.ParseAll(TBLat.Text)
-        TBLatDisp.Text = Parser.DecDegToString(lat, "N")
+        TBLatDisp.Text = Parser.DecDegToDMSString(lat, "N")
         If lat <> SeeSatVBmain.my_loc.lat_deg Then
             HasChanged = True
             loc_lat = lat
@@ -40,7 +41,7 @@ Public Class UserSettings
     Private Sub TBlong_Leave(sender As Object, e As EventArgs) Handles TBLong.Leave
         Dim lon As Double
         lon = Parser.ParseAll(TBLong.Text)
-        TBLongDisp.Text = Parser.DecDegToString(lon, "E")
+        TBLongDisp.Text = Parser.DecDegToDMSString(lon, "E")
         If lon <> SeeSatVBmain.my_loc.lon_deg Then
             HasChanged = True
             loc_lon = lon
@@ -192,6 +193,10 @@ Public Class Parser
     Private Shared DegMinRegex As New Regex(DegMinPattern, RegexOptions)
     Private Shared DegMinSecRegex As New Regex(DegMinSecPattern, RegexOptions)
 
+    Private Shared fstyle As NumberStyles = NumberStyles.Float
+    Private Shared iculture As CultureInfo = CultureInfo.InvariantCulture
+
+
     Public Shared Function ParseAll(value As String) As Double
         ' try each of the parsers in turn
         Dim rval As Double
@@ -253,7 +258,9 @@ Public Class Parser
         Dim secondValue As Double = 0
 
         '      ' First try parsing the values (minutes and seconds are optional)
-        If Not Double.TryParse(degrees, degreeValue) OrElse ((minutes IsNot Nothing) AndAlso Not Double.TryParse(minutes, minuteValue)) OrElse ((seconds IsNot Nothing) AndAlso Not Double.TryParse(seconds, secondValue)) Then
+        If Not Double.TryParse(degrees, fstyle, iculture, degreeValue) OrElse ((minutes IsNot Nothing) _
+                AndAlso Not Double.TryParse(minutes, fstyle, iculture, minuteValue)) OrElse ((seconds IsNot Nothing) _
+                AndAlso Not Double.TryParse(seconds, fstyle, iculture, secondValue)) Then
             Return Nothing
         End If
 
@@ -302,11 +309,11 @@ Public Class Parser
     End Function
 
     'pass a decimal angle in degrees and a flag N or E and get back a DD MM SS.S with (optional) N/S or E/W qualifer 
-    Friend Shared Function DecDegToString(ByVal Deg As Double, Optional ByVal Flag As String = "") As String
+    Friend Shared Function DecDegToDMSString(ByVal Deg As Double, Optional ByVal Flag As String = "") As String
         Dim sign As String
         Dim d, m As Integer
         Dim s As Double
-        Dim format As String = "{0} {1}° {2}' {3}"""
+        Dim format As String = "{0}{1}° {2}' {3}"""
 
         Select Case Flag
             Case Is = "N"   ' we want lat
@@ -335,6 +342,38 @@ Public Class Parser
         s = Math.Round((Deg - d - m / 60) * 3600, 2)
 
         Return String.Format(Format, sign, d, m, s)
+
+    End Function
+
+    'pass a decimal angle in degrees and get back a HH MM SS.S
+    Friend Shared Function DecDegToHrString(ByVal Deg As Double, Optional ByVal Flag As String = "") As String
+        Dim sign As String
+        Dim d, h, m As Integer
+        Dim s As Double
+        Dim format As String = "{0}{1}h {2}m {3}s"
+
+        Select Case Flag
+            Case Is = "E"   ' we want long
+                If Math.Sign(Deg) < 0 Then
+                    sign = "W"
+                Else
+                    sign = "E"
+                End If
+            Case Else   ' no flag or unrecognized
+                If Math.Sign(Deg) < 0 Then
+                    sign = "-"
+                Else
+                    sign = " "
+                End If
+        End Select
+
+        Deg = Math.Abs(Deg)
+        h = CInt(Fix(Deg / DefConst.HRS2DEG))
+        'd = CInt(Fix(Deg))
+        m = CInt(Fix((Deg / DefConst.HRS2DEG - h) * 60))
+        s = Math.Round((Deg / DefConst.HRS2DEG - h - m / 60) * 3600, 2)
+        'h = CInt(Fix(d / DefConst.HRS2DEG))
+        Return String.Format(format, sign, h, m, s)
 
     End Function
 End Class

@@ -511,6 +511,9 @@ Public Class SeeSatVBmain
             End If
         End If
 
+        TextBox1.AppendText(" User location: lat: " + Parser.DecDegToDMSString(my_loc.lat_deg, "N") + " lon: " + _
+                Parser.DecDegToDMSString(my_loc.lon_deg, "E") + " TimeZone: " + CStr(my_loc.tz_offset) + vbNewLine)
+
     End Sub
 
     ' show all of the satellites in a realtime display
@@ -581,7 +584,7 @@ Public Class SeeSatVBmain
                 ' do stuff every 300 ticks
             End If
 
-            ' to fix a bug where the stars are out of place until xyztop has been called once - ll
+            ' to fix a bug where the stars are out of place until xyztop has been called once
             If SatWindow.SHOWSTARS And AstroGR.FIRSTIME Then
                 AstroGR.initstar()
                 If SatWindow.initStarD() = 0 Then
