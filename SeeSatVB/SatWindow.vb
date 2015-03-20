@@ -847,20 +847,22 @@ Public Class SatWindow
             If distance < mindist Then
                 ToolTipSat.Show(SatsD(sndx).name + vbNewLine + "Mag " + CStr(SeeSatVBmain.satellites(sndx).view.truemag) + vbNewLine _
                     + "Dist " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.r * DefConst.EARTHR2KM, 4)), _
-                    Me, mouse_xy.X, mouse_xy.Y, 10000)
-                SeeSatVBmain.TextBox1.AppendText(SeeSatVBmain.satellites(sndx).tlename + " - McName: " + SeeSatVBmain.satellites(sndx).tle0.satname + _
-                    " - Itnl: " + CStr(SeeSatVBmain.satellites(sndx).tle.intl_desig) + vbNewLine + " - Norad#: " + _
+                    Me, mouse_xy.X + 20, mouse_xy.Y + 20, 10000)
+
+                SeeSatVBmain.TextBox1.AppendText(vbNewLine + SeeSatVBmain.satellites(sndx).tlename + " / " + SeeSatVBmain.satellites(sndx).tle0.satname + _
+                    " - ID: " + CStr(SeeSatVBmain.satellites(sndx).tle.intl_desig) + " - N#: " + _
                     CStr(SeeSatVBmain.satellites(sndx).tle.norad_number) + " - ElSet: " + SeeSatVBmain.satellites(sndx).elset + vbNewLine)
-                SeeSatVBmain.TextBox1.AppendText(" Time (UTC): " + CStr(AstroGR.Julian2Gregorian(SeeSatVBmain.JDPUB)) + _
-                    " (Local):" + CStr(AstroGR.Julian2Gregorian(SeeSatVBmain.JDPUB + SeeSatVBmain.my_loc.tz_offset / DefConst.HRPERDAY)) + vbNewLine)
+                SeeSatVBmain.TextBox1.AppendText(" Time (UTC): " + AstroGR.Julian2Gregorian(SeeSatVBmain.JDPUB).ToString("MMM/dd/yyyy HH:mm:ss") + _
+                    " (Local):" + AstroGR.Julian2Gregorian(SeeSatVBmain.JDPUB + SeeSatVBmain.my_loc.tz_offset / DefConst.HRPERDAY).ToString("MMM/dd/yyyy HH:mm:ss") + vbNewLine)
                 SeeSatVBmain.TextBox1.AppendText(" Alt: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.phi * DefConst.RA2DE, 4)) + _
                     " Azm: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.lambda * DefConst.RA2DE, 4)) + _
-                    " Dist: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.r * DefConst.EARTHR2KM, 4)) + " km" + vbNewLine)
-                SeeSatVBmain.TextBox1.AppendText(" RA: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.radec.lambda * DefConst.RA2DE, 4)) + _
-                    " Dec: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.radec.phi * DefConst.RA2DE, 4)) + _
-                    " Dist: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.radec.r * DefConst.EARTHR2KM, 4)) + " km" + vbNewLine)
+                    " Dist: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.r * DefConst.EARTHR2KM, 3)) + " km" + vbNewLine)
+                SeeSatVBmain.TextBox1.AppendText(" RA: " + Parser.DecDegToHrString(SeeSatVBmain.satellites(sndx).view.radec.lambda * DefConst.RA2DE, "E") + _
+                    " Dec: " + Parser.DecDegToDMSString(SeeSatVBmain.satellites(sndx).view.radec.phi * DefConst.RA2DE, "N"))
                 SeeSatVBmain.TextBox1.AppendText(" Sun angle: " + CStr(SeeSatVBmain.satellites(sndx).view.elsusa) + " Illum: " + _
-                    CStr(CInt(SeeSatVBmain.satellites(sndx).view.illum * 100)) + "% Mag: " + CStr(SeeSatVBmain.satellites(sndx).view.truemag) + vbNewLine + vbNewLine)
+                    CStr(CInt(SeeSatVBmain.satellites(sndx).view.illum * 100)) + "% Mag: " + CStr(SeeSatVBmain.satellites(sndx).view.truemag) + _
+                    SeeSatVBmain.satellites(sndx).tle0.magflg + vbNewLine)
+
                 DEBUG = True
             End If
             'ToolTipSat.Hide(Me)
@@ -908,20 +910,21 @@ Public Class SatWindow
 
         If (e.Button = Windows.Forms.MouseButtons.Left) Then
 
-
             FindNearestSat(mouse_xy_user, sndx, distance)
             If distance < mindist Then
                 TextBoxS.AppendText(vbNewLine + SeeSatVBmain.satellites(sndx).tlename + " / " + SeeSatVBmain.satellites(sndx).tle0.satname + _
-                    " - ElSet: " + SeeSatVBmain.satellites(sndx).elset + vbNewLine)
+                    " - ID: " + CStr(SeeSatVBmain.satellites(sndx).tle.intl_desig) + " - N#: " + _
+                    CStr(SeeSatVBmain.satellites(sndx).tle.norad_number) + " - ElSet: " + SeeSatVBmain.satellites(sndx).elset + vbNewLine)
                 TextBoxS.AppendText(" Time (UTC): " + AstroGR.Julian2Gregorian(SeeSatVBmain.JDPUB).ToString("MMM/dd/yyyy HH:mm:ss") + _
                     " (Local):" + AstroGR.Julian2Gregorian(SeeSatVBmain.JDPUB + SeeSatVBmain.my_loc.tz_offset / DefConst.HRPERDAY).ToString("MMM/dd/yyyy HH:mm:ss") + vbNewLine)
-                TextBoxS.AppendText(" Alt: " + Parser.DecDegToDMSString(SeeSatVBmain.satellites(sndx).view.azel.phi * DefConst.RA2DE) + _
-                    " Azm: " + Parser.DecDegToDMSString(SeeSatVBmain.satellites(sndx).view.azel.lambda * DefConst.RA2DE) + _
-                    " Dist: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.r * DefConst.EARTHR2KM, 4)) + " km" + vbNewLine)
-                TextBoxS.AppendText(" RA: " + Parser.DecDegToHrString(SeeSatVBmain.satellites(sndx).view.radec.lambda * DefConst.RA2DE) + _
-                    " Dec: " + Parser.DecDegToDMSString(SeeSatVBmain.satellites(sndx).view.radec.phi * DefConst.RA2DE))
+                TextBoxS.AppendText(" Alt: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.phi * DefConst.RA2DE, 4)) + _
+                    " Azm: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.lambda * DefConst.RA2DE, 4)) + _
+                    " Dist: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.r * DefConst.EARTHR2KM, 3)) + " km" + vbNewLine)
+                TextBoxS.AppendText(" RA: " + Parser.DecDegToHrString(SeeSatVBmain.satellites(sndx).view.radec.lambda * DefConst.RA2DE, "E") + _
+                    " Dec: " + Parser.DecDegToDMSString(SeeSatVBmain.satellites(sndx).view.radec.phi * DefConst.RA2DE, "N"))
                 TextBoxS.AppendText(" Sun angle: " + CStr(SeeSatVBmain.satellites(sndx).view.elsusa) + " Illum: " + _
-                    CStr(CInt(SeeSatVBmain.satellites(sndx).view.illum * 100)) + "% Mag: " + CStr(SeeSatVBmain.satellites(sndx).view.truemag) + vbNewLine)
+                    CStr(CInt(SeeSatVBmain.satellites(sndx).view.illum * 100)) + "% Mag: " + CStr(SeeSatVBmain.satellites(sndx).view.truemag) + _
+                    SeeSatVBmain.satellites(sndx).tle0.magflg + vbNewLine)
 
             End If
         End If

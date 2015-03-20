@@ -187,6 +187,7 @@ Public Class SatIO
                         End If
 
                         ' still to do deal with mag flag
+                        ' the mccants codes are d and v
 
                         Select Case CChar(currentRow(6))
                             Case Is = CChar("")
@@ -331,12 +332,13 @@ Public Class SatIO
                         End If
 
                         ' still to do deal with mag flag
+                        ' the quicksat codes are c, f, t, h, d, g, J, s, l, and one i.
 
-                        Select Case CChar(currentRow(1))
+                        Select Case CChar(currentRow(1).Trim)
                             Case Is = CChar("")
                                 tle0.magflg = CChar("q")
                             Case Else
-                                tle0.magflg = CChar(currentRow(1))
+                                tle0.magflg = CChar(currentRow(1).Trim)
                         End Select
 
                         If Not tle0Dict.ContainsKey(ID) Then
@@ -480,9 +482,15 @@ Public Class SatIO
                                     tle0.slength = 0
                                     tle0.swidth = 0
                                     tle0.sdepth = 0
-                                    tle0.smag = DefConst.SATDEFMAG ' set as default
+                                    If InStr(tle0.satname, " DEB") > 1 Then      ' it is likely debris
+                                        tle0.smag = DefConst.SATDEFMAG + 4 ' lets make it really dim
+                                        tle0.magflg = CChar("z")   'unknown
+                                    Else
+                                        tle0.smag = DefConst.SATDEFMAG      ' set default - nominally 6
+                                        tle0.magflg = CChar("x")   'unknown
+                                    End If
                                     tle0.rxsect = 0
-                                    tle0.magflg = CChar("u")   'unknown
+
                                 End If
                                 ' create or find sat element and attach the tle structs
                                 sndx = SeeSatVBmain.find_or_create_sat_element(tle.intl_desig)

@@ -7,6 +7,9 @@ Public Class UserSettings
     Public Shared loc_lat, loc_lon, loc_elev, loc_tz As Double
     Public Shared loc_name As String
 
+    Private Shared fstyle As NumberStyles = NumberStyles.Float
+    Private Shared iculture As CultureInfo = CultureInfo.InvariantCulture
+
 
     Private Sub UserSettings_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
@@ -16,15 +19,15 @@ Public Class UserSettings
         loc_tz = SeeSatVBmain.my_loc.tz_offset
         loc_name = SeeSatVBmain.my_loc.loc_name
 
-        TBLat.Text = CStr(SeeSatVBmain.my_loc.lat_deg)          '= My.Settings.user_lat
+        TBLat.Text = SeeSatVBmain.my_loc.lat_deg.ToString(iculture)               '= My.Settings.user_lat
         TBLatDisp.Text = Parser.DecDegToDMSString(loc_lat, "N")
         'SeeSatVBmain.my_loc.lat_rad = My.Settings.user_lat * DefConst.DE2RA
-        TBLong.Text = CStr(SeeSatVBmain.my_loc.lon_deg)         '= My.Settings.user_lon
+        TBLong.Text = SeeSatVBmain.my_loc.lon_deg.ToString(iculture)         '= My.Settings.user_lon
         TBLongDisp.Text = Parser.DecDegToDMSString(loc_lon, "E")
         'SeeSatVBmain.my_loc.lon_rad = My.Settings.user_lon * DefConst.DE2RA
-        TBElev.Text = CStr(SeeSatVBmain.my_loc.ht_in_meters)    '= My.Settings.user_ht_in_meters
+        TBElev.Text = SeeSatVBmain.my_loc.ht_in_meters.ToString(iculture)    '= My.Settings.user_ht_in_meters
         TBLName.Text = SeeSatVBmain.my_loc.loc_name              '= My.Settings.user_loc_name
-        TBTZoffset.Text = CStr(SeeSatVBmain.my_loc.tz_offset)   '= My.Settings.user_tz
+        TBTZoffset.Text = SeeSatVBmain.my_loc.tz_offset.ToString(iculture)   '= My.Settings.user_tz
 
     End Sub
 

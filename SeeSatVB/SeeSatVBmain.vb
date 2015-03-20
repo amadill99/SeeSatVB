@@ -265,6 +265,18 @@ Public Class SeeSatVBmain
         (ByRef params As Double, <MarshalAs(UnmanagedType.Struct)> ByRef tle As tle_t, ByVal Model As Integer) As Integer
     End Function
 
+    'SDP4 and SGP4 can return zero,  or any of the following error/warning codes.
+    'The 'warnings' result in a mathematically reasonable value being returned,
+    'and perigee within the earth is completely reasonable for an object that's
+    'just left the earth or is about to hit it.  The 'errors' mean that no
+    'reasonable position/velocity was determined.       
+
+    Public Const SXPX_ERR_NEARLY_PARABOLIC = -1
+    Public Const SXPX_ERR_NEGATIVE_MAJOR_AXIS = -2
+    Public Const SXPX_WARN_ORBIT_WITHIN_EARTH = -3
+    Public Const SXPX_WARN_PERIGEE_WITHIN_EARTH = -4
+    Public Const SXPX_ERR_NEGATIVE_XN = -5
+
     Public Shared SatNdx As Integer = 0   ' Last satellite in array sats
     Public Shared satellites(SatNdx) As sat_t
 
@@ -539,6 +551,10 @@ Public Class SeeSatVBmain
 
         For sndx = 1 To SatNdx  'go once through the list
 
+            If Not satellites(sndx).is_valid Then
+                Continue For
+            End If
+
             If satellites(sndx).tag < 0 Then    ' it has been flagged as below the horizon
                 satellites(sndx).tag += 1
                 Continue For
@@ -552,9 +568,21 @@ Public Class SeeSatVBmain
 
             t_since = (JDPUB - satellites(sndx).tle.epoch) * DefConst.MINPERDAY
 
-            _SGPX(t_since, satellites(sndx).tle, satellites(sndx).sat_params(0), _
+            rval = _SGPX(t_since, satellites(sndx).tle, satellites(sndx).sat_params(0), _
                   satellites(sndx).pos(0), satellites(sndx).vel(0), satellites(sndx).Model)
 
+            Select Case rval
+
+                Case SXPX_ERR_NEARLY_PARABOLIC, SXPX_ERR_NEGATIVE_MAJOR_AXIS, SXPX_ERR_NEGATIVE_XN
+                    ' error - has decayed or something else is wrong - skip
+                    satellites(sndx).is_valid = False
+                    Continue For
+
+                Case SXPX_WARN_ORBIT_WITHIN_EARTH, SXPX_WARN_PERIGEE_WITHIN_EARTH
+                    ' just launched or about to reenter
+                    satellites(sndx).tag = -99999
+
+            End Select
             ' compute positions as per AstroVB
             ' transfer the position values - each time the satellite changes or change astrovb to look at the global vars 
             AstroGR.set_sat_xyz(satellites(sndx).pos)

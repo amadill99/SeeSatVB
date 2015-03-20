@@ -28,18 +28,19 @@ namespace SGP4space
 	// dispatch function for SGPX
 	int SGP4class::SGPX(const double tsince, const tle_t *tle, const double *params, double *pos, double *vel, const int model)
 	{
+		int rval;
 
 		if (model == SGP4M)
-			SGP4(tsince, tle, params, pos, vel);
+			rval = SGP4(tsince, tle, params, pos, vel);
 		/*else if (model == SGP8M)
 			SGP8(tsince, tle, params, pos, vel);/**/
 		else if (model == SDP4M)
-			SDP4(tsince, tle, params, pos, vel);
+			rval = SDP4(tsince, tle, params, pos, vel);
 		/*else if (model == SDP8M)
 			SDP8(tsince, tle, params, pos, vel);/**/
 		else return -1;
 		
-		return 0;
+		return rval;
 	}
 
 
