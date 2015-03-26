@@ -160,6 +160,10 @@ Public Class SeeSatVBmain
     ' offset to the time that we are working in
     Public Shared JDOFFSET As Double = 0  ' measured in decimal days
 
+    Public Shared SYSCLOCKERR As Double = 0 ' system clock offset from NTP time
+
+    Public Shared PMTOFFSET As Double = 0   ' predict mode offset time in decimal hours
+
     ' ATLAS CENTAUR 2 
     'Dim tle1 As String = "1 00694U 63047A   14359.71852084  .00002470  00000-0  31909-3 0  6700"
     'Dim tle2 As String = "2 00694  30.3564  96.2656 0595383 111.9600  39.6867 14.00230273555744"
@@ -194,7 +198,7 @@ Public Class SeeSatVBmain
     Public Shared REALTIME As Boolean = False
     ' How long to sleep in milisec if realtime
     Dim SLEEPTIME As Integer = 1000
-
+    
 
     ' use this style of declarations if using the decorated style names
     'Public Declare Sub SGP4_init Lib "SGP4dll.dll" Alias "_SGP4_init@8" (ByRef params As Double, ByRef tle As tle_t)
@@ -354,10 +358,45 @@ Public Class SeeSatVBmain
         version = _sxpx_library_version()
         outs = CStr(version)
 
-        TextBox1.AppendText("library version returned " + outs)
+        TextBox1.AppendText("library version returned " + outs + vbNewLine)
 
         'chk_rval(SatIO.ReadTLE(my_files.tle_path), my_files.tle_path)
         'tle_test(satellites(1).sat_params(0), satellites(1).tle, CInt(version))
+        'testTimeserver()
+
+    End Sub
+
+    Private Sub NTPTimeserver()
+        'test the NTPClient
+        Dim timeServer As String = "0.pool.ntp.org"
+        Dim updateSysClock As Boolean = True
+        Dim tsResult As Boolean
+
+        TextBox1.AppendText("contacting " + timeServer + vbNewLine)
+        Application.DoEvents()
+
+        Dim client As New InternetTime.SNTPClient(timeServer)
+
+        Try
+
+            client = New InternetTime.SNTPClient(timeServer)
+            'client.Connect(5000, False)
+            tsResult = client.Connect(updateSysClock)
+
+        Catch ex As Exception
+
+            TextBox1.AppendText("ERROR: " + ex.Message + ".")
+            Return
+
+        End Try
+
+        'Display results
+        TextBox1.AppendText(client.ToString())
+
+        If updateSysClock And Not tsResult Then
+            ' our attempt at setting the clock failed because of UAC
+            SYSCLOCKERR = client.LocalClockOffset       ' in msec
+        End If
 
     End Sub
 
@@ -899,14 +938,14 @@ Public Class SeeSatVBmain
 
     End Sub
 
-    Private Sub ShowSky_Click(sender As Object, e As EventArgs) Handles ShowSky.Click
+    Private Sub BSatWindow_Click(sender As Object, e As EventArgs) Handles BSatWindow.Click
 
         Dim frmCollection = System.Windows.Forms.Application.OpenForms
         If frmCollection.OfType(Of SatWindow).Any Then
             frmCollection.Item("SatWindow").Activate()
         Else
-            Dim SkyView As New SatWindow
-            SkyView.Show()
+            Dim SatWindow As New SatWindow
+            SatWindow.Show()
         End If
 
 
@@ -1118,6 +1157,73 @@ Public Class SeeSatVBmain
         End If
         RealTimeDisplay()
 
+    End Sub
+
+    Private Sub SetNTPTimeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetNTPTimeToolStripMenuItem.Click
+        ' get the NTP time from the Internet and if UAC allows it set the system clock.
+        NTPTimeserver()
+
+    End Sub
+
+    Private Sub NUpDownSec_ValueChanged(sender As Object, e As EventArgs) Handles NUpDownSec.ValueChanged
+
+        'setPMTimeOffset()
+        If NUpDownSec.Value = 60 Then
+            NUpDownSec.Value = 0
+            NUpDownMin.Value += 1
+        End If
+        If NUpDownSec.Value = -60 Then
+            NUpDownSec.Value = 0
+            NUpDownMin.Value -= 1
+        End If
+    End Sub
+
+    Private Sub NUpDownMin_ValueChanged(sender As Object, e As EventArgs) Handles NUpDownMin.ValueChanged
+
+        'setPMTimeOffset()
+        If NUpDownMin.Value = 60 Then
+            NUpDownMin.Value = 0
+            NUpDownHr.Value += 1
+        End If
+        If NUpDownMin.Value = -60 Then
+            NUpDownMin.Value = 0
+            NUpDownHr.Value -= 1
+        End If
+    End Sub
+
+    Private Sub NUpDownHr_ValueChanged(sender As Object, e As EventArgs) Handles NUpDownHr.ValueChanged
+        'setPMTimeOffset()
+    End Sub
+
+    Private Sub NUpDownHr_Leave(sender As Object, e As EventArgs) Handles NUpDownHr.Leave
+        setPMTimeOffset()
+    End Sub
+
+    Private Sub NUpDownMin_Leave(sender As Object, e As EventArgs) Handles NUpDownMin.Leave
+        setPMTimeOffset()
+    End Sub
+
+    Private Sub NUpDownSec_Leave(sender As Object, e As EventArgs) Handles NUpDownSec.Leave
+        setPMTimeOffset()
+    End Sub
+
+
+    Private Sub setPMTimeOffset()
+        PMTOFFSET = NUpDownHr.Value + NUpDownMin.Value / 60 + NUpDownSec.Value / 3600
+        NUpDownHr.Value = CDec(Fix(PMTOFFSET))
+        NUpDownMin.Value = CDec(Fix((PMTOFFSET - NUpDownHr.Value) * 60))
+        NUpDownSec.Value = CDec(Fix(((PMTOFFSET - NUpDownHr.Value) - NUpDownMin.Value / 60) * 3600))
+    End Sub
+
+    Private Sub RadioButtonPM_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButtonPM.CheckedChanged
+        ' predict mode
+        If RadioButtonPM.Checked Then
+            GroupBoxPM.Enabled = True
+            GroupBoxTS.Enabled = True
+        Else
+            GroupBoxPM.Enabled = False
+            GroupBoxTS.Enabled = False
+        End If
     End Sub
 
 End Class

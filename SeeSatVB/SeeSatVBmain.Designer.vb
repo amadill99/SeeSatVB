@@ -26,7 +26,7 @@ Partial Class SeeSatVBmain
         Me.Button1 = New System.Windows.Forms.Button()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.Button2 = New System.Windows.Forms.Button()
-        Me.ShowSky = New System.Windows.Forms.Button()
+        Me.BSatWindow = New System.Windows.Forms.Button()
         Me.TimerR = New System.Windows.Forms.Timer(Me.components)
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
@@ -36,19 +36,35 @@ Partial Class SeeSatVBmain
         Me.VisualMagFileToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.StarDataFileToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.TLEFileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OptionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.SaveDefaultsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.UserLocationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SetNTPTimeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SaveDefaultsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TimerS = New System.Windows.Forms.Timer(Me.components)
         Me.DateTimePickerRT = New System.Windows.Forms.DateTimePicker()
-        Me.LabelRT = New System.Windows.Forms.Label()
         Me.CheckBoxUTC = New System.Windows.Forms.CheckBox()
         Me.RadioButtonPM = New System.Windows.Forms.RadioButton()
         Me.RadioButtonRT = New System.Windows.Forms.RadioButton()
         Me.GroupBoxTM = New System.Windows.Forms.GroupBox()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
+        Me.GroupBoxPM = New System.Windows.Forms.GroupBox()
+        Me.RadioButtonST = New System.Windows.Forms.RadioButton()
+        Me.RadioButtonTO = New System.Windows.Forms.RadioButton()
+        Me.NUpDownHr = New System.Windows.Forms.NumericUpDown()
+        Me.NUpDownMin = New System.Windows.Forms.NumericUpDown()
+        Me.NUpDownSec = New System.Windows.Forms.NumericUpDown()
+        Me.LabelHr = New System.Windows.Forms.Label()
+        Me.LabelMin = New System.Windows.Forms.Label()
+        Me.LabelSec = New System.Windows.Forms.Label()
+        Me.GroupBoxTS = New System.Windows.Forms.GroupBox()
         Me.MenuStrip1.SuspendLayout()
         Me.GroupBoxTM.SuspendLayout()
+        Me.GroupBoxPM.SuspendLayout()
+        CType(Me.NUpDownHr, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.NUpDownMin, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.NUpDownSec, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBoxTS.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button1
@@ -62,7 +78,7 @@ Partial Class SeeSatVBmain
         '
         'TextBox1
         '
-        Me.TextBox1.Location = New System.Drawing.Point(131, 42)
+        Me.TextBox1.Location = New System.Drawing.Point(122, 27)
         Me.TextBox1.Multiline = True
         Me.TextBox1.Name = "TextBox1"
         Me.TextBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both
@@ -78,14 +94,14 @@ Partial Class SeeSatVBmain
         Me.Button2.Text = "Test"
         Me.Button2.UseVisualStyleBackColor = True
         '
-        'ShowSky
+        'BSatWindow
         '
-        Me.ShowSky.Location = New System.Drawing.Point(15, 170)
-        Me.ShowSky.Name = "ShowSky"
-        Me.ShowSky.Size = New System.Drawing.Size(75, 22)
-        Me.ShowSky.TabIndex = 3
-        Me.ShowSky.Text = "SkyView"
-        Me.ShowSky.UseVisualStyleBackColor = True
+        Me.BSatWindow.Location = New System.Drawing.Point(15, 170)
+        Me.BSatWindow.Name = "BSatWindow"
+        Me.BSatWindow.Size = New System.Drawing.Size(75, 22)
+        Me.BSatWindow.TabIndex = 3
+        Me.BSatWindow.Text = "SatWindow"
+        Me.BSatWindow.UseVisualStyleBackColor = True
         '
         'TimerR
         '
@@ -102,7 +118,7 @@ Partial Class SeeSatVBmain
         '
         'ToolStripMenuItem1
         '
-        Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem})
+        Me.ToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.ExitToolStripMenuItem})
         Me.ToolStripMenuItem1.Name = "ToolStripMenuItem1"
         Me.ToolStripMenuItem1.Size = New System.Drawing.Size(37, 20)
         Me.ToolStripMenuItem1.Text = "File"
@@ -144,24 +160,36 @@ Partial Class SeeSatVBmain
         Me.TLEFileToolStripMenuItem.Size = New System.Drawing.Size(169, 22)
         Me.TLEFileToolStripMenuItem.Text = "TLE File"
         '
+        'ExitToolStripMenuItem
+        '
+        Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(103, 22)
+        Me.ExitToolStripMenuItem.Text = "Exit"
+        '
         'OptionsToolStripMenuItem
         '
-        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaveDefaultsToolStripMenuItem, Me.UserLocationToolStripMenuItem})
+        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserLocationToolStripMenuItem, Me.SetNTPTimeToolStripMenuItem, Me.SaveDefaultsToolStripMenuItem})
         Me.OptionsToolStripMenuItem.Name = "OptionsToolStripMenuItem"
         Me.OptionsToolStripMenuItem.Size = New System.Drawing.Size(61, 20)
         Me.OptionsToolStripMenuItem.Text = "Options"
         '
-        'SaveDefaultsToolStripMenuItem
-        '
-        Me.SaveDefaultsToolStripMenuItem.Name = "SaveDefaultsToolStripMenuItem"
-        Me.SaveDefaultsToolStripMenuItem.Size = New System.Drawing.Size(146, 22)
-        Me.SaveDefaultsToolStripMenuItem.Text = "Save Defaults"
-        '
         'UserLocationToolStripMenuItem
         '
         Me.UserLocationToolStripMenuItem.Name = "UserLocationToolStripMenuItem"
-        Me.UserLocationToolStripMenuItem.Size = New System.Drawing.Size(146, 22)
+        Me.UserLocationToolStripMenuItem.Size = New System.Drawing.Size(161, 22)
         Me.UserLocationToolStripMenuItem.Text = "User Location"
+        '
+        'SetNTPTimeToolStripMenuItem
+        '
+        Me.SetNTPTimeToolStripMenuItem.Name = "SetNTPTimeToolStripMenuItem"
+        Me.SetNTPTimeToolStripMenuItem.Size = New System.Drawing.Size(161, 22)
+        Me.SetNTPTimeToolStripMenuItem.Text = "Set NTP Time"
+        '
+        'SaveDefaultsToolStripMenuItem
+        '
+        Me.SaveDefaultsToolStripMenuItem.Name = "SaveDefaultsToolStripMenuItem"
+        Me.SaveDefaultsToolStripMenuItem.Size = New System.Drawing.Size(161, 22)
+        Me.SaveDefaultsToolStripMenuItem.Text = "Save All Defaults"
         '
         'TimerS
         '
@@ -169,28 +197,16 @@ Partial Class SeeSatVBmain
         'DateTimePickerRT
         '
         Me.DateTimePickerRT.CustomFormat = "MM/dd/yyyy - HH:mm:ss"
-        Me.DateTimePickerRT.Enabled = False
         Me.DateTimePickerRT.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.DateTimePickerRT.Location = New System.Drawing.Point(12, 426)
+        Me.DateTimePickerRT.Location = New System.Drawing.Point(92, 16)
         Me.DateTimePickerRT.Name = "DateTimePickerRT"
-        Me.DateTimePickerRT.Size = New System.Drawing.Size(148, 20)
+        Me.DateTimePickerRT.Size = New System.Drawing.Size(157, 20)
         Me.DateTimePickerRT.TabIndex = 5
-        '
-        'LabelRT
-        '
-        Me.LabelRT.AutoSize = True
-        Me.LabelRT.Enabled = False
-        Me.LabelRT.Location = New System.Drawing.Point(12, 410)
-        Me.LabelRT.Name = "LabelRT"
-        Me.LabelRT.Size = New System.Drawing.Size(53, 13)
-        Me.LabelRT.TabIndex = 7
-        Me.LabelRT.Text = "Run Time"
         '
         'CheckBoxUTC
         '
         Me.CheckBoxUTC.AutoSize = True
-        Me.CheckBoxUTC.Enabled = False
-        Me.CheckBoxUTC.Location = New System.Drawing.Point(166, 429)
+        Me.CheckBoxUTC.Location = New System.Drawing.Point(36, 16)
         Me.CheckBoxUTC.Name = "CheckBoxUTC"
         Me.CheckBoxUTC.Size = New System.Drawing.Size(48, 17)
         Me.CheckBoxUTC.TabIndex = 8
@@ -223,8 +239,7 @@ Partial Class SeeSatVBmain
         '
         Me.GroupBoxTM.Controls.Add(Me.RadioButtonRT)
         Me.GroupBoxTM.Controls.Add(Me.RadioButtonPM)
-        Me.GroupBoxTM.Enabled = False
-        Me.GroupBoxTM.Location = New System.Drawing.Point(12, 328)
+        Me.GroupBoxTM.Location = New System.Drawing.Point(15, 309)
         Me.GroupBoxTM.Name = "GroupBoxTM"
         Me.GroupBoxTM.Size = New System.Drawing.Size(89, 70)
         Me.GroupBoxTM.TabIndex = 11
@@ -237,16 +252,121 @@ Partial Class SeeSatVBmain
         Me.ImageList1.ImageSize = New System.Drawing.Size(16, 16)
         Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
         '
+        'GroupBoxPM
+        '
+        Me.GroupBoxPM.Controls.Add(Me.RadioButtonST)
+        Me.GroupBoxPM.Controls.Add(Me.RadioButtonTO)
+        Me.GroupBoxPM.Location = New System.Drawing.Point(15, 387)
+        Me.GroupBoxPM.Name = "GroupBoxPM"
+        Me.GroupBoxPM.Size = New System.Drawing.Size(89, 70)
+        Me.GroupBoxPM.TabIndex = 12
+        Me.GroupBoxPM.TabStop = False
+        Me.GroupBoxPM.Text = "Predict Mode"
+        '
+        'RadioButtonST
+        '
+        Me.RadioButtonST.AutoSize = True
+        Me.RadioButtonST.Checked = True
+        Me.RadioButtonST.Location = New System.Drawing.Point(6, 18)
+        Me.RadioButtonST.Name = "RadioButtonST"
+        Me.RadioButtonST.Size = New System.Drawing.Size(73, 17)
+        Me.RadioButtonST.TabIndex = 10
+        Me.RadioButtonST.TabStop = True
+        Me.RadioButtonST.Text = "Start Time"
+        Me.RadioButtonST.UseVisualStyleBackColor = True
+        '
+        'RadioButtonTO
+        '
+        Me.RadioButtonTO.AutoSize = True
+        Me.RadioButtonTO.Location = New System.Drawing.Point(6, 41)
+        Me.RadioButtonTO.Name = "RadioButtonTO"
+        Me.RadioButtonTO.Size = New System.Drawing.Size(79, 17)
+        Me.RadioButtonTO.TabIndex = 9
+        Me.RadioButtonTO.Text = "Time Offset"
+        Me.RadioButtonTO.UseVisualStyleBackColor = True
+        '
+        'NUpDownHr
+        '
+        Me.NUpDownHr.Location = New System.Drawing.Point(37, 39)
+        Me.NUpDownHr.Maximum = New Decimal(New Integer() {96, 0, 0, 0})
+        Me.NUpDownHr.Minimum = New Decimal(New Integer() {96, 0, 0, -2147483648})
+        Me.NUpDownHr.Name = "NUpDownHr"
+        Me.NUpDownHr.Size = New System.Drawing.Size(47, 20)
+        Me.NUpDownHr.TabIndex = 13
+        Me.NUpDownHr.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'NUpDownMin
+        '
+        Me.NUpDownMin.Location = New System.Drawing.Point(117, 39)
+        Me.NUpDownMin.Maximum = New Decimal(New Integer() {60, 0, 0, 0})
+        Me.NUpDownMin.Minimum = New Decimal(New Integer() {60, 0, 0, -2147483648})
+        Me.NUpDownMin.Name = "NUpDownMin"
+        Me.NUpDownMin.Size = New System.Drawing.Size(47, 20)
+        Me.NUpDownMin.TabIndex = 14
+        Me.NUpDownMin.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'NUpDownSec
+        '
+        Me.NUpDownSec.Location = New System.Drawing.Point(202, 39)
+        Me.NUpDownSec.Maximum = New Decimal(New Integer() {60, 0, 0, 0})
+        Me.NUpDownSec.Minimum = New Decimal(New Integer() {60, 0, 0, -2147483648})
+        Me.NUpDownSec.Name = "NUpDownSec"
+        Me.NUpDownSec.Size = New System.Drawing.Size(47, 20)
+        Me.NUpDownSec.TabIndex = 15
+        Me.NUpDownSec.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'LabelHr
+        '
+        Me.LabelHr.AutoSize = True
+        Me.LabelHr.Location = New System.Drawing.Point(13, 41)
+        Me.LabelHr.Name = "LabelHr"
+        Me.LabelHr.Size = New System.Drawing.Size(18, 13)
+        Me.LabelHr.TabIndex = 16
+        Me.LabelHr.Text = "Hr"
+        '
+        'LabelMin
+        '
+        Me.LabelMin.AutoSize = True
+        Me.LabelMin.Location = New System.Drawing.Point(89, 41)
+        Me.LabelMin.Name = "LabelMin"
+        Me.LabelMin.Size = New System.Drawing.Size(24, 13)
+        Me.LabelMin.TabIndex = 17
+        Me.LabelMin.Text = "Min"
+        '
+        'LabelSec
+        '
+        Me.LabelSec.AutoSize = True
+        Me.LabelSec.Location = New System.Drawing.Point(170, 41)
+        Me.LabelSec.Name = "LabelSec"
+        Me.LabelSec.Size = New System.Drawing.Size(26, 13)
+        Me.LabelSec.TabIndex = 18
+        Me.LabelSec.Text = "Sec"
+        '
+        'GroupBoxTS
+        '
+        Me.GroupBoxTS.Controls.Add(Me.DateTimePickerRT)
+        Me.GroupBoxTS.Controls.Add(Me.LabelSec)
+        Me.GroupBoxTS.Controls.Add(Me.CheckBoxUTC)
+        Me.GroupBoxTS.Controls.Add(Me.LabelMin)
+        Me.GroupBoxTS.Controls.Add(Me.NUpDownHr)
+        Me.GroupBoxTS.Controls.Add(Me.LabelHr)
+        Me.GroupBoxTS.Controls.Add(Me.NUpDownMin)
+        Me.GroupBoxTS.Controls.Add(Me.NUpDownSec)
+        Me.GroupBoxTS.Location = New System.Drawing.Point(122, 387)
+        Me.GroupBoxTS.Name = "GroupBoxTS"
+        Me.GroupBoxTS.Size = New System.Drawing.Size(258, 70)
+        Me.GroupBoxTS.TabIndex = 19
+        Me.GroupBoxTS.TabStop = False
+        '
         'SeeSatVBmain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(560, 469)
+        Me.Controls.Add(Me.GroupBoxTS)
+        Me.Controls.Add(Me.GroupBoxPM)
         Me.Controls.Add(Me.GroupBoxTM)
-        Me.Controls.Add(Me.CheckBoxUTC)
-        Me.Controls.Add(Me.LabelRT)
-        Me.Controls.Add(Me.DateTimePickerRT)
-        Me.Controls.Add(Me.ShowSky)
+        Me.Controls.Add(Me.BSatWindow)
         Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.TextBox1)
         Me.Controls.Add(Me.Button1)
@@ -258,6 +378,13 @@ Partial Class SeeSatVBmain
         Me.MenuStrip1.PerformLayout()
         Me.GroupBoxTM.ResumeLayout(False)
         Me.GroupBoxTM.PerformLayout()
+        Me.GroupBoxPM.ResumeLayout(False)
+        Me.GroupBoxPM.PerformLayout()
+        CType(Me.NUpDownHr, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.NUpDownMin, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.NUpDownSec, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBoxTS.ResumeLayout(False)
+        Me.GroupBoxTS.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -265,7 +392,7 @@ Partial Class SeeSatVBmain
     Friend WithEvents Button1 As System.Windows.Forms.Button
     Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
     Friend WithEvents Button2 As System.Windows.Forms.Button
-    Friend WithEvents ShowSky As System.Windows.Forms.Button
+    Friend WithEvents BSatWindow As System.Windows.Forms.Button
     Friend WithEvents TimerR As System.Windows.Forms.Timer
     Friend WithEvents MenuStrip1 As System.Windows.Forms.MenuStrip
     Friend WithEvents ToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
@@ -279,12 +406,23 @@ Partial Class SeeSatVBmain
     Friend WithEvents SaveDefaultsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents TimerS As System.Windows.Forms.Timer
     Friend WithEvents DateTimePickerRT As System.Windows.Forms.DateTimePicker
-    Friend WithEvents LabelRT As System.Windows.Forms.Label
     Friend WithEvents CheckBoxUTC As System.Windows.Forms.CheckBox
     Friend WithEvents RadioButtonPM As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButtonRT As System.Windows.Forms.RadioButton
     Friend WithEvents GroupBoxTM As System.Windows.Forms.GroupBox
     Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
     Friend WithEvents UserLocationToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ExitToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents SetNTPTimeToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents GroupBoxPM As System.Windows.Forms.GroupBox
+    Friend WithEvents RadioButtonST As System.Windows.Forms.RadioButton
+    Friend WithEvents RadioButtonTO As System.Windows.Forms.RadioButton
+    Friend WithEvents NUpDownHr As System.Windows.Forms.NumericUpDown
+    Friend WithEvents NUpDownMin As System.Windows.Forms.NumericUpDown
+    Friend WithEvents NUpDownSec As System.Windows.Forms.NumericUpDown
+    Friend WithEvents LabelHr As System.Windows.Forms.Label
+    Friend WithEvents LabelMin As System.Windows.Forms.Label
+    Friend WithEvents LabelSec As System.Windows.Forms.Label
+    Friend WithEvents GroupBoxTS As System.Windows.Forms.GroupBox
 
 End Class

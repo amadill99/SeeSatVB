@@ -856,9 +856,9 @@ Public Class SatWindow
                     " (Local):" + AstroGR.Julian2Gregorian(SeeSatVBmain.JDPUB + SeeSatVBmain.my_loc.tz_offset / DefConst.HRPERDAY).ToString("MMM/dd/yyyy HH:mm:ss") + vbNewLine)
                 SeeSatVBmain.TextBox1.AppendText(" Alt: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.phi * DefConst.RA2DE, 4)) + _
                     " Azm: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.lambda * DefConst.RA2DE, 4)) + _
-                    " Dist: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.r * DefConst.EARTHR2KM, 3)) + " km" + vbNewLine)
-                SeeSatVBmain.TextBox1.AppendText(" RA: " + Parser.DecDegToHrString(SeeSatVBmain.satellites(sndx).view.radec.lambda * DefConst.RA2DE, "E") + _
-                    " Dec: " + Parser.DecDegToDMSString(SeeSatVBmain.satellites(sndx).view.radec.phi * DefConst.RA2DE, "N"))
+                    " Dist: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.r * DefConst.EARTHR2KM, 1)) + " km" + vbNewLine)
+                SeeSatVBmain.TextBox1.AppendText(" RA: " + Parser.DecDegToHrString(SeeSatVBmain.satellites(sndx).view.radec.lambda * DefConst.RA2DE, "", 0) + _
+                    " Dec: " + Parser.DecDegToDMSString(SeeSatVBmain.satellites(sndx).view.radec.phi * DefConst.RA2DE, "N", 0))
                 SeeSatVBmain.TextBox1.AppendText(" Sun angle: " + CStr(SeeSatVBmain.satellites(sndx).view.elsusa) + " Illum: " + _
                     CStr(CInt(SeeSatVBmain.satellites(sndx).view.illum * 100)) + "% Mag: " + CStr(SeeSatVBmain.satellites(sndx).view.truemag) + _
                     SeeSatVBmain.satellites(sndx).tle0.magflg + vbNewLine)
@@ -919,9 +919,9 @@ Public Class SatWindow
                     " (Local):" + AstroGR.Julian2Gregorian(SeeSatVBmain.JDPUB + SeeSatVBmain.my_loc.tz_offset / DefConst.HRPERDAY).ToString("MMM/dd/yyyy HH:mm:ss") + vbNewLine)
                 TextBoxS.AppendText(" Alt: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.phi * DefConst.RA2DE, 4)) + _
                     " Azm: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.lambda * DefConst.RA2DE, 4)) + _
-                    " Dist: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.r * DefConst.EARTHR2KM, 3)) + " km" + vbNewLine)
-                TextBoxS.AppendText(" RA: " + Parser.DecDegToHrString(SeeSatVBmain.satellites(sndx).view.radec.lambda * DefConst.RA2DE, "E") + _
-                    " Dec: " + Parser.DecDegToDMSString(SeeSatVBmain.satellites(sndx).view.radec.phi * DefConst.RA2DE, "N"))
+                    " Dist: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.r * DefConst.EARTHR2KM, 1)) + " km" + vbNewLine)
+                TextBoxS.AppendText(" RA: " + Parser.DecDegToHrString(SeeSatVBmain.satellites(sndx).view.radec.lambda * DefConst.RA2DE, "", 0) + _
+                    " Dec: " + Parser.DecDegToDMSString(SeeSatVBmain.satellites(sndx).view.radec.phi * DefConst.RA2DE, "N", 0))
                 TextBoxS.AppendText(" Sun angle: " + CStr(SeeSatVBmain.satellites(sndx).view.elsusa) + " Illum: " + _
                     CStr(CInt(SeeSatVBmain.satellites(sndx).view.illum * 100)) + "% Mag: " + CStr(SeeSatVBmain.satellites(sndx).view.truemag) + _
                     SeeSatVBmain.satellites(sndx).tle0.magflg + vbNewLine)

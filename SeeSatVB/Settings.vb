@@ -312,7 +312,7 @@ Public Class Parser
     End Function
 
     'pass a decimal angle in degrees and a flag N or E and get back a DD MM SS.S with (optional) N/S or E/W qualifer 
-    Friend Shared Function DecDegToDMSString(ByVal Deg As Double, Optional ByVal Flag As String = "") As String
+    Friend Shared Function DecDegToDMSString(ByVal Deg As Double, Optional ByVal Flag As String = "", Optional ByVal precis As Integer = 2) As String
         Dim sign As String
         Dim d, m As Integer
         Dim s As Double
@@ -342,14 +342,14 @@ Public Class Parser
         Deg = Math.Abs(Deg)
         d = CInt(Fix(Deg))
         m = CInt(Fix((Deg - d) * 60))
-        s = Math.Round((Deg - d - m / 60) * 3600, 2)
+        s = Math.Round((Deg - d - m / 60) * 3600, precis)
 
-        Return String.Format(Format, sign, d, m, s)
+        Return String.Format(format, sign, d, m, s)
 
     End Function
 
     'pass a decimal angle in degrees and get back a HH MM SS.S
-    Friend Shared Function DecDegToHrString(ByVal Deg As Double, Optional ByVal Flag As String = "") As String
+    Friend Shared Function DecDegToHrString(ByVal Deg As Double, Optional ByVal Flag As String = "", Optional ByVal precis As Integer = 2) As String
         Dim sign As String
         Dim d, h, m As Integer
         Dim s As Double
@@ -374,7 +374,7 @@ Public Class Parser
         h = CInt(Fix(Deg / DefConst.HRS2DEG))
         'd = CInt(Fix(Deg))
         m = CInt(Fix((Deg / DefConst.HRS2DEG - h) * 60))
-        s = Math.Round((Deg / DefConst.HRS2DEG - h - m / 60) * 3600, 2)
+        s = Math.Round((Deg / DefConst.HRS2DEG - h - m / 60) * 3600, precis)
         'h = CInt(Fix(d / DefConst.HRS2DEG))
         Return String.Format(format, sign, h, m, s)
 
