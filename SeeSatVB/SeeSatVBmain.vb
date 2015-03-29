@@ -1207,7 +1207,7 @@ Public Class SeeSatVBmain
         setPMTimeOffset()
     End Sub
 
-
+    ' recalculate and update up/down time selectors
     Private Sub setPMTimeOffset()
         PMTOFFSET = NUpDownHr.Value + NUpDownMin.Value / 60 + NUpDownSec.Value / 3600
         NUpDownHr.Value = CDec(Fix(PMTOFFSET))

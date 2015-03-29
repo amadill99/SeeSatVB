@@ -54,7 +54,7 @@ Public Class SatWindow
     Public Shared starColorB As Color = Color.LightGray
 
     Public Shared LIMITMAG As Double = 8 ' smallest mag to display - change to 8
-    Public Shared SHOWSTARS As Boolean = True  ' paint routine uses this to decide to display stars
+    Public Shared SHOWSTARS As Boolean = False  ' paint routine uses this to decide to display stars
 
     Public Shared STZ As Integer = CInt(WSIZE * 0.002)  ' 20 - used int plotazel base satellite size
     Public Shared SRZ As Integer = CInt(WSIZE * 0.001)  ' 10 - used int plotazel base star size
@@ -671,7 +671,7 @@ Public Class SatWindow
 
         gr.DrawEllipse(p, New Rectangle(-WSIZE, -WSIZE, WSIZE * 2, WSIZE * 2))
 
-        If VIEWSTEREO Then  ' sterographic projection
+        If VIEWSTEREO Then  ' stereographic projection
             tsize = CInt(WSIZE * Math.Tan((DefConst.PIO2 - 30.0 * DefConst.DE2RA) / 2))
             gr.DrawEllipse(p, New Rectangle(-tsize, -tsize, tsize * 2, tsize * 2))
             tsize = CInt(WSIZE * Math.Tan((DefConst.PIO2 - 60.0 * DefConst.DE2RA) / 2))
@@ -1009,14 +1009,43 @@ Public Class SatWindow
             mouse_xy_old = mouse_xy
             mouse_xy.X = e.X
             mouse_xy.Y = e.Y
-
-            If Not IsNothing(grMatrix) Then
-                mouse_xy_user.X = CInt((e.Location.X - grMatrix.OffsetX) / grMatrix.Elements(0))
-                mouse_xy_user.Y = CInt((e.Location.Y - grMatrix.OffsetY) / grMatrix.Elements(3))
-            End If
-
         End If
 
+        If Not IsNothing(grMatrix) Then
+            mouse_xy_user.X = CInt((e.Location.X - grMatrix.OffsetX) / grMatrix.Elements(0))
+            mouse_xy_user.Y = CInt((e.Location.Y - grMatrix.OffsetY) / grMatrix.Elements(3))
+        End If
+
+        'If e.Y < CanvasBounds.Top Or e.Y > CanvasBounds.Bottom Or e.X < CanvasBounds.Left Or e.X > CanvasBounds.Right Then
+        If Math.Sqrt(mouse_xy_user.X ^ 2 + mouse_xy_user.Y ^ 2) > WSIZE Then
+            ToolStripSLMouseXY.Text = String.Empty
+        Else
+            Dim Alt, Azm As Double
+            MouseXYtoAltAzm(mouse_xy_user, Alt, Azm)
+            'ToolStripSLMouseXY.Text = "X " + CStr(mouse_xy_user.X) + " Y " + CStr(mouse_xy_user.Y)
+            'ToolStripSLMouseXY.Text = "Alt " + Parser.DecDegToDMSString(Alt * DefConst.RA2DE, "", 0) + " Azm " + Parser.DecDegToDMSString(Azm * DefConst.RA2DE, "", 0)
+            ToolStripSLMouseXY.Text = "Alt: " + CStr(Math.Round(Alt * DefConst.RA2DE, 4)) + " Azm: " + CStr(Math.Round(Azm * DefConst.RA2DE, 4))
+            Dim Ra, Dec As Double
+            If AstroGR.AltAzmtoRaDec(Alt, Azm, Ra, Dec) AndAlso Alt <> 0 Then
+                ToolStripSLMouseXY.Text = ToolStripSLMouseXY.Text + " RA: " + Parser.DecDegToHrString(Ra * DefConst.RA2DE, "", 0) + _
+                    " Dec: " + Parser.DecDegToDMSString(Dec * DefConst.RA2DE, "N", 0)
+            End If
+        End If
+
+    End Sub
+
+    Private Sub MouseXYtoAltAzm(ByVal mXY As Point, ByRef Alt As Double, ByRef Azm As Double)
+
+        If VIEWSTEREO Then
+            Alt = -2 * Math.Atan(Math.Sqrt(mXY.X ^ 2 + mXY.Y ^ 2) / WSIZE) + DefConst.PIO2
+            Azm = -Math.Atan2(mXY.X, mXY.Y)
+        Else
+            Alt = Math.Acos(Math.Sqrt(mXY.X ^ 2 + mXY.Y ^ 2) / WSIZE)
+            Azm = -Math.Atan2(mXY.X, mXY.Y)
+        End If
+        If Azm < 0 Then
+            Azm += DefConst.PI * 2
+        End If
     End Sub
 
 

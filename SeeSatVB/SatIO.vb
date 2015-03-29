@@ -81,9 +81,11 @@ Public Class SatIO
 
         If StarNdx > 1 Then
             ReDim Preserve stars(StarNdx - 1)
+            SatWindow.SHOWSTARS = True
         Else
             ReDim stars(1)
             StarNdx = 0
+            SatWindow.SHOWSTARS = False
         End If
 
         SeeSatVBmain.TextBox1.AppendText("read " + CStr(StarNdx) + " stars." + vbNewLine)

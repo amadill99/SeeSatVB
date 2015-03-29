@@ -747,6 +747,57 @@ Public Class AstroGR
 
     End Function
 
+    ' ATM - ref https://groups.google.com/forum/#!topic/sara-list/1isnv33wSoU
+    'convert alt azm to ra dec at current llhra
+    'checks to see if we are in an active run and returns false if not
+    'angles in radians
+    Public Shared Function AltAzmtoRaDec(ByVal Alt As Double, ByVal Azm As Double, ByRef Ra As Double, ByRef Dec As Double) As Boolean
+
+        If SatWindow.SHOWSTARS = False Then
+            Return False
+        End If
+
+        If SeeSatVBmain.obs Is Nothing Then
+            MessageBox.Show("Tilt - obs struct not initialized - call topos")
+            Return False
+        End If
+
+        Dim sinDec As Double = SeeSatVBmain.obs.sinlat * Math.Sin(Alt) + SeeSatVBmain.obs.coslat * Math.Cos(Alt) * Math.Cos(Azm)
+        Dec = Math.Asin(sinDec)
+        Dim cosH As Double = (Math.Sin(Alt) - sinDec * SeeSatVBmain.obs.sinlat) / (Math.Cos(Dec) * SeeSatVBmain.obs.coslat)
+
+        ' rare case where cosH is fractionally less than -1 or more than 1
+        If cosH < -1 Then
+            cosH = -1
+        End If
+
+        If cosH > 1 Then
+            cosH = 1
+        End If
+
+        ' local hour of aries for the time and observers position
+        Ra = localhra - Math.Acos(cosH)
+
+        If Ra < 0 Then
+            Ra += DefConst.TWOPI
+        End If
+        
+        Return True
+
+        ' http://mathematica.stackexchange.com/questions/69330/astronomy-transform-coordinates-from-horizon-to-equatorial
+        '       AzElToRADec[{azimuth_, elevation_}, lattitude_, LST_] := 
+        'Module[{sinDec, cosLHA, sinLHA, Dec, RA, LHA}, 
+        ' sinDec = Sin[elevation Degree] Sin[lattitude Degree] + 
+        ' Cos[elevation Degree] Cos[lattitude Degree] Cos[azimuth Degree];
+        ' Dec = ArcSin[sinDec]/Degree;
+        ' sinLHA = -((Sin[azimuth Degree] Cos[elevation Degree])/Cos[Dec Degree]);
+        ' cosLHA = (Sin[elevation Degree] - Sin[lattitude Degree] Sin[Dec Degree])/(Cos[Dec Degree] Cos[lattitude Degree]);
+        ' LHA = ArcTan[cosLHA, sinLHA]/Degree;
+        ' RA = Mod[LST - LHA, 360];
+        ' {RA, Dec}]   
+    End Function
+
+
     '==================================================================
     ' Put the mean equatorial xyz components of a unit vector to sun at
     'epoch "ep" into struct "pos".  Good to about .01 deg.

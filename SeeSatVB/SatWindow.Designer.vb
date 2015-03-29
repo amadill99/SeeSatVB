@@ -27,6 +27,9 @@ Partial Class SatWindow
         Me.ToolTipSat = New System.Windows.Forms.ToolTip(Me.components)
         Me.TimerM = New System.Windows.Forms.Timer(Me.components)
         Me.TextBoxS = New System.Windows.Forms.TextBox()
+        Me.StatusStripSW = New System.Windows.Forms.StatusStrip()
+        Me.ToolStripSLMouseXY = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.StatusStripSW.SuspendLayout()
         Me.SuspendLayout()
         '
         'TimerR
@@ -56,6 +59,22 @@ Partial Class SatWindow
         Me.TextBoxS.Size = New System.Drawing.Size(346, 642)
         Me.TextBoxS.TabIndex = 0
         '
+        'StatusStripSW
+        '
+        Me.StatusStripSW.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripSLMouseXY})
+        Me.StatusStripSW.Location = New System.Drawing.Point(0, 620)
+        Me.StatusStripSW.Name = "StatusStripSW"
+        Me.StatusStripSW.Size = New System.Drawing.Size(670, 22)
+        Me.StatusStripSW.TabIndex = 1
+        Me.StatusStripSW.Text = "StatusStrip1"
+        '
+        'ToolStripSLMouseXY
+        '
+        Me.ToolStripSLMouseXY.BackColor = System.Drawing.SystemColors.Control
+        Me.ToolStripSLMouseXY.Name = "ToolStripSLMouseXY"
+        Me.ToolStripSLMouseXY.Size = New System.Drawing.Size(50, 17)
+        Me.ToolStripSLMouseXY.Text = "Holding"
+        '
         'SatWindow
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -64,10 +83,13 @@ Partial Class SatWindow
         Me.AutoSize = True
         Me.BackColor = System.Drawing.SystemColors.Desktop
         Me.ClientSize = New System.Drawing.Size(1016, 642)
+        Me.Controls.Add(Me.StatusStripSW)
         Me.Controls.Add(Me.TextBoxS)
         Me.DoubleBuffered = True
         Me.Name = "SatWindow"
         Me.Text = "SatWindow"
+        Me.StatusStripSW.ResumeLayout(False)
+        Me.StatusStripSW.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -76,4 +98,6 @@ Partial Class SatWindow
     Friend WithEvents ToolTipSat As System.Windows.Forms.ToolTip
     Friend WithEvents TimerM As System.Windows.Forms.Timer
     Friend WithEvents TextBoxS As System.Windows.Forms.TextBox
+    Friend WithEvents StatusStripSW As System.Windows.Forms.StatusStrip
+    Friend WithEvents ToolStripSLMouseXY As System.Windows.Forms.ToolStripStatusLabel
 End Class
