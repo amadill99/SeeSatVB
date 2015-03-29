@@ -747,7 +747,7 @@ Public Class AstroGR
 
     End Function
 
-    ' ATM - ref https://groups.google.com/forum/#!topic/sara-list/1isnv33wSoU
+    ' ATM - ref https://groups.google.com/forum/#!topic/sara-list/1isnv33wSoU - this was wrong - the mathmatica ref below is better
     'convert alt azm to ra dec at current llhra
     'checks to see if we are in an active run and returns false if not
     'angles in radians
@@ -758,30 +758,21 @@ Public Class AstroGR
         End If
 
         If SeeSatVBmain.obs Is Nothing Then
-            MessageBox.Show("Tilt - obs struct not initialized - call topos")
+            'MessageBox.Show("Tilt - obs struct not initialized - call topos")
             Return False
         End If
 
         Dim sinDec As Double = SeeSatVBmain.obs.sinlat * Math.Sin(Alt) + SeeSatVBmain.obs.coslat * Math.Cos(Alt) * Math.Cos(Azm)
         Dec = Math.Asin(sinDec)
+        Dim sinH As Double = -((Math.Sin(Azm) * Math.Cos(Alt)) / Math.Cos(Dec))
         Dim cosH As Double = (Math.Sin(Alt) - sinDec * SeeSatVBmain.obs.sinlat) / (Math.Cos(Dec) * SeeSatVBmain.obs.coslat)
 
-        ' rare case where cosH is fractionally less than -1 or more than 1
-        If cosH < -1 Then
-            cosH = -1
-        End If
-
-        If cosH > 1 Then
-            cosH = 1
-        End If
-
-        ' local hour of aries for the time and observers position
-        Ra = localhra - Math.Acos(cosH)
+        Ra = (localhra - (Math.Atan2(sinH, cosH) Mod DefConst.TWOPI))
 
         If Ra < 0 Then
             Ra += DefConst.TWOPI
         End If
-        
+
         Return True
 
         ' http://mathematica.stackexchange.com/questions/69330/astronomy-transform-coordinates-from-horizon-to-equatorial
