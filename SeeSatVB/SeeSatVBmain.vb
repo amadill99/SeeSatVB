@@ -313,9 +313,15 @@ Public Class SeeSatVBmain
         ' - refresh timer intervals
         my_params.sat_time_int = My.Settings.user_sat_int
         my_params.star_time_int = My.Settings.user_star_int
+        my_params.ntp_onstart = My.Settings.user_ntp_onstart
+        If my_params.ntp_onstart Then
+            OnStartUpToolStripMenuItem.Checked = True
+            NTPTimeserver()
+        End If
 
         'visual settings
         my_params.view_stereo = My.Settings.user_view_stereo
+        my_params.center_onzoom = My.Settings.user_center_onzoom
 
     End Sub
 
@@ -339,9 +345,11 @@ Public Class SeeSatVBmain
         'save the user defined program parameters
         My.Settings.user_star_int = my_params.star_time_int
         My.Settings.user_sat_int = my_params.sat_time_int
+        My.Settings.user_ntp_onstart = my_params.ntp_onstart
 
         'visual settings
         My.Settings.user_view_stereo = my_params.view_stereo
+        My.Settings.user_center_onzoom = my_params.center_onzoom
 
         My.Settings.Save()
 
@@ -461,14 +469,14 @@ Public Class SeeSatVBmain
                 TimerS.Enabled = True
             End If
 
-            Button2.Text = "Stop Test"
+            Button2.Text = "Stop"
 
         Else
             REALTIME = False
             TimerR.Enabled = False
             TimerS.Enabled = False
 
-            Button2.Text = "Test"
+            Button2.Text = "Start"
 
         End If
 
@@ -1142,6 +1150,16 @@ Public Class SeeSatVBmain
 
     End Sub
 
+    Private Sub SetNowToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetNowToolStripMenuItem.Click
+        ' get the NTP time from the Internet and if UAC allows it set the system clock.
+        NTPTimeserver()
+
+    End Sub
+
+    Private Sub OnStartUpToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles OnStartUpToolStripMenuItem.Click
+        my_params.ntp_onstart = OnStartUpToolStripMenuItem.Checked
+    End Sub
+
     ' realtime timer - on each tick calls the realtimedisplay routine
     Private Sub TimerR_Tick(sender As Object, e As EventArgs) Handles TimerR.Tick
         'TimerR.Enabled = False
@@ -1156,12 +1174,6 @@ Public Class SeeSatVBmain
             SatWindow.initStarD()
         End If
         RealTimeDisplay()
-
-    End Sub
-
-    Private Sub SetNTPTimeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetNTPTimeToolStripMenuItem.Click
-        ' get the NTP time from the Internet and if UAC allows it set the system clock.
-        NTPTimeserver()
 
     End Sub
 
@@ -1275,4 +1287,6 @@ Public Class prog_params
     Public star_time_int As Integer 'update interval for the star timer
     Public sat_time_int As Integer  'update interval for the satellite timer
     Public view_stereo As Boolean   'use a sterographic projection
+    Public center_onzoom As Boolean   ' when zooming in center the mouse
+    Public ntp_onstart As Boolean   'attempt to get NTP time on startup
 End Class

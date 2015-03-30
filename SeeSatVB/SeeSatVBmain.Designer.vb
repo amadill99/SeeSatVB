@@ -40,6 +40,8 @@ Partial Class SeeSatVBmain
         Me.OptionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.UserLocationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SetNTPTimeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SetNowToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.OnStartUpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SaveDefaultsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TimerS = New System.Windows.Forms.Timer(Me.components)
         Me.DateTimePickerRT = New System.Windows.Forms.DateTimePicker()
@@ -91,7 +93,7 @@ Partial Class SeeSatVBmain
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(75, 23)
         Me.Button2.TabIndex = 2
-        Me.Button2.Text = "Test"
+        Me.Button2.Text = "Run"
         Me.Button2.UseVisualStyleBackColor = True
         '
         'BSatWindow
@@ -181,9 +183,23 @@ Partial Class SeeSatVBmain
         '
         'SetNTPTimeToolStripMenuItem
         '
+        Me.SetNTPTimeToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SetNowToolStripMenuItem, Me.OnStartUpToolStripMenuItem})
         Me.SetNTPTimeToolStripMenuItem.Name = "SetNTPTimeToolStripMenuItem"
         Me.SetNTPTimeToolStripMenuItem.Size = New System.Drawing.Size(161, 22)
         Me.SetNTPTimeToolStripMenuItem.Text = "Set NTP Time"
+        '
+        'SetNowToolStripMenuItem
+        '
+        Me.SetNowToolStripMenuItem.Name = "SetNowToolStripMenuItem"
+        Me.SetNowToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.SetNowToolStripMenuItem.Text = "Set Now"
+        '
+        'OnStartUpToolStripMenuItem
+        '
+        Me.OnStartUpToolStripMenuItem.CheckOnClick = True
+        Me.OnStartUpToolStripMenuItem.Name = "OnStartUpToolStripMenuItem"
+        Me.OnStartUpToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.OnStartUpToolStripMenuItem.Text = "On Start Up"
         '
         'SaveDefaultsToolStripMenuItem
         '
@@ -424,5 +440,7 @@ Partial Class SeeSatVBmain
     Friend WithEvents LabelMin As System.Windows.Forms.Label
     Friend WithEvents LabelSec As System.Windows.Forms.Label
     Friend WithEvents GroupBoxTS As System.Windows.Forms.GroupBox
+    Friend WithEvents SetNowToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents OnStartUpToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class

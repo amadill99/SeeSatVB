@@ -503,7 +503,7 @@ Namespace InternetTime
                 If tsSuccess Then
                     tsString = "System clock set successfully."
                 Else
-                    tsString = "System clock not set."
+                    tsString = "System clock not set (UAC)."
                 End If
             End If
             Return tsSuccess

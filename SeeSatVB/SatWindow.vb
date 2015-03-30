@@ -975,6 +975,10 @@ Public Class SatWindow
         End If
         If e.Delta > 0 And WSCALE < WMAXSCALE Then
             WSCALE += 1
+            ' move the cursor to the center of the window if zooming in
+            If SeeSatVBmain.my_params.center_onzoom Then
+                Windows.Forms.Cursor.Position = New Point(CInt(Bounds.X + (CanvasBounds.Left * 2 + CanvasBounds.Right) / 2), CInt(Bounds.Y + (CanvasBounds.Top * 2 + CanvasBounds.Bottom) / 2))
+            End If
         End If
 
         WXOFFSET = CInt(((e.Location.X - grMatrix.OffsetX) / grMatrix.Elements(0)))
@@ -1022,7 +1026,7 @@ Public Class SatWindow
         Else
             Dim Alt, Azm As Double
             MouseXYtoAltAzm(mouse_xy_user, Alt, Azm)
-            'ToolStripSLMouseXY.Text = "X " + CStr(mouse_xy_user.X) + " Y " + CStr(mouse_xy_user.Y)
+            'ToolStripSLMouseXY.Text = "uX:" + CStr(mouse_xy_user.X) + " uY:" + CStr(mouse_xy_user.Y) + " mX:" + CStr(e.X) + " mY:" + CStr(e.Y)
             'ToolStripSLMouseXY.Text = "Alt " + Parser.DecDegToDMSString(Alt * DefConst.RA2DE, "", 0) + " Azm " + Parser.DecDegToDMSString(Azm * DefConst.RA2DE, "", 0)
             ToolStripSLMouseXY.Text = "Alt: " + CStr(Math.Round(Alt * DefConst.RA2DE, 4)) + " Azm: " + CStr(Math.Round(Azm * DefConst.RA2DE, 4))
             Dim Ra, Dec As Double

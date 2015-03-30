@@ -209,6 +209,30 @@ Namespace My
                 Me("user_view_stereo") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(), _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")> _
+        Public Property user_ntp_onstart() As Boolean
+            Get
+                Return CType(Me("user_ntp_onstart"), Boolean)
+            End Get
+            Set(value As Boolean)
+                Me("user_ntp_onstart") = value
+            End Set
+        End Property
+
+        <Global.System.Configuration.UserScopedSettingAttribute(), _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")> _
+        Public Property user_center_onzoom() As Boolean
+            Get
+                Return CType(Me("user_center_onzoom"), Boolean)
+            End Get
+            Set(value As Boolean)
+                Me("user_center_onzoom") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

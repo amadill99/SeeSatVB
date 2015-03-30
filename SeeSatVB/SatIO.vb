@@ -470,7 +470,11 @@ Public Class SatIO
                                 Dim tle0 As New tle0_t
                                 ' we can fill in the tle0 struct
                                 If line0.Length = 6 Then ' we have a valid tle0 line, use it
-                                    tle0.satname = line0(0).Substring(1)
+                                    If InStr(line0(0), "0 ") = 1 Then
+                                        tle0.satname = line0(0).Substring(1)
+                                    Else
+                                        tle0.satname = line0(0)
+                                    End If
                                     tle0.slength = str2sng(line0(1))
                                     tle0.swidth = str2sng(line0(2))
                                     tle0.sdepth = str2sng(line0(3))
@@ -480,7 +484,12 @@ Public Class SatIO
                                 ElseIf tle0Dict.ContainsKey(tle.norad_number) Then  ' fill it in from the dictionary of visual values
                                     tle0 = tle0Dict(tle.norad_number)
                                 Else
-                                    tle0.satname = line0(0).Substring(1)     ' fill in default values
+                                    If InStr(line0(0), "0 ") = 1 Then
+                                        tle0.satname = line0(0).Substring(1)
+                                    Else
+                                        tle0.satname = line0(0)
+                                    End If
+                                    'tle0.satname = line0(0).Substring(1)     ' fill in default values
                                     tle0.slength = 0
                                     tle0.swidth = 0
                                     tle0.sdepth = 0
@@ -496,7 +505,11 @@ Public Class SatIO
                                 End If
                                 ' create or find sat element and attach the tle structs
                                 sndx = SeeSatVBmain.find_or_create_sat_element(tle.intl_desig)
-                                SeeSatVBmain.satellites(sndx).tlename = line0(0).Substring(1)
+                                If InStr(line0(0), "0 ") = 1 Then
+                                    SeeSatVBmain.satellites(sndx).tlename = line0(0).Substring(1)
+                                Else
+                                    SeeSatVBmain.satellites(sndx).tlename = line0(0)
+                                End If
                                 SeeSatVBmain.satellites(sndx).tle = tle
                                 SeeSatVBmain.satellites(sndx).tle0 = tle0
                                 SeeSatVBmain.satellites(sndx).is_valid = True
