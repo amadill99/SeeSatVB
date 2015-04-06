@@ -44,8 +44,9 @@ Partial Friend NotInheritable Class DefConst
     Public Const INTL_SIZE As Integer = 9
     Public Const N_POS_SIZE As Integer = 2
 
+    Public Const SECPERDAY As Double = 86400.0
     Public Const MINPERDAY As Double = 1440.0
-    Public Const HRPERDAY As Double = 24
+    Public Const HRPERDAY As Double = 24.0
     Public Const HRS2DEG As Double = 15.0
     Public Const EARTHR2KM As Double = 6378.135
     Public Const KM2EARTHR As Double = 1 / EARTHR2KM

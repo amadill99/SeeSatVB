@@ -158,11 +158,15 @@ Public Class SeeSatVBmain
     ' current working Julian Date/Time shared 
     Public Shared JDPUB As Double
     ' offset to the time that we are working in
-    Public Shared JDOFFSET As Double = 0  ' measured in decimal days
+    'Public Shared JDOFFSET As Double = 0  ' measured in decimal days
 
-    Public Shared SYSCLOCKERR As Double = 0 ' system clock offset from NTP time
+    Public Shared SYSCLOCKERR As Double = 0 ' system clock offset in msec from NTP time
 
-    Public Shared PMTOFFSET As Double = 0   ' predict mode offset time in decimal hours
+    Public Shared PMTOFFSET As Double = 0   ' predict mode offset time in decimal days
+
+    Public Shared TIMENOW As DateTime     ' the instant in time of our prediction run
+
+    Private Shared dateChanged As Boolean = False   ' flag for datepickerrt
 
     ' ATLAS CENTAUR 2 
     'Dim tle1 As String = "1 00694U 63047A   14359.71852084  .00002470  00000-0  31909-3 0  6700"
@@ -319,9 +323,16 @@ Public Class SeeSatVBmain
             NTPTimeserver()
         End If
 
+        PM_CheckToggle()
+        TO_CheckToggle()
+
         'visual settings
         my_params.view_stereo = My.Settings.user_view_stereo
+        StereoProjectionToolStripMenuItem.Checked = My.Settings.user_view_stereo
         my_params.center_onzoom = My.Settings.user_center_onzoom
+        my_params.sat_limit = My.Settings.user_sat_limit
+        my_params.sat_mag = My.Settings.user_sat_mag
+        FilterByMagToolStripMenuItem.Checked = my_params.sat_limit
 
     End Sub
 
@@ -350,6 +361,8 @@ Public Class SeeSatVBmain
         'visual settings
         My.Settings.user_view_stereo = my_params.view_stereo
         My.Settings.user_center_onzoom = my_params.center_onzoom
+        My.Settings.user_sat_limit = my_params.sat_limit
+        My.Settings.user_sat_mag = my_params.sat_mag
 
         My.Settings.Save()
 
@@ -470,6 +483,7 @@ Public Class SeeSatVBmain
             End If
 
             Button2.Text = "Stop"
+            restart_pmode()
 
         Else
             REALTIME = False
@@ -543,7 +557,7 @@ Public Class SeeSatVBmain
         tz = 0
         testDate = DateTime.UtcNow
 
-        JDPUB = Date2Julian(testDate) + JDOFFSET
+        JDPUB = Date2Julian(testDate)
 
         ' does some initializing in AstroVB
         tz_offset = AstroGR.topos(my_loc.ht_in_meters, my_loc.lat_deg, my_loc.lon_deg, tz) / DefConst.MINPERDAY
@@ -607,7 +621,13 @@ Public Class SeeSatVBmain
                 Continue For
             End If
 
-            JDPUB = Date2Julian(DateTime.UtcNow) + JDOFFSET
+            TIMENOW = DateTime.UtcNow
+            TIMENOW = TIMENOW.AddMilliseconds(SYSCLOCKERR)
+            If RadioButtonPM.Checked Then
+                TIMENOW = TIMENOW.AddDays(PMTOFFSET)
+            End If
+
+            JDPUB = Date2Julian(TIMENOW)
 
             ' not sure if the next line is required
             _lat_alt_to_parallax(my_loc.lat_rad, my_loc.ht_in_meters, rho_cos_phi, rho_sin_phi)
@@ -630,6 +650,7 @@ Public Class SeeSatVBmain
                     satellites(sndx).tag = -99999
 
             End Select
+
             ' compute positions as per AstroVB
             ' transfer the position values - each time the satellite changes or change astrovb to look at the global vars 
             AstroGR.set_sat_xyz(satellites(sndx).pos)
@@ -639,6 +660,17 @@ Public Class SeeSatVBmain
             ' rval can be 0 - sat below horizon, 1 - sat should be visable, 2 - sat more than 2 earth radii away
             iflag2 = 1
             rval = AstroGR.xyztop(iflag2, JDPUB * DefConst.MINPERDAY, sndx)
+
+            ' check the limiting magnitude to display
+            If my_params.sat_limit Then
+                If satellites(sndx).view.truemag > my_params.sat_mag Then
+                    satellites(sndx).tag = CInt(satellites(sndx).view.truemag) 'skip the next X iterations
+                    If SatWindow.SatsD.Length > sndx AndAlso SatWindow.SatsD(sndx).isActive Then  ' it just slipped past the limiting mag
+                        SatWindow.SatsD(sndx).isActive = False
+                    End If
+                    Continue For
+                End If
+            End If
 
             Select Case rval
                 Case Is = 0     ' sat is below horizon
@@ -1160,31 +1192,22 @@ Public Class SeeSatVBmain
         my_params.ntp_onstart = OnStartUpToolStripMenuItem.Checked
     End Sub
 
-    ' realtime timer - on each tick calls the realtimedisplay routine
-    Private Sub TimerR_Tick(sender As Object, e As EventArgs) Handles TimerR.Tick
-        'TimerR.Enabled = False
-        RealTimeDisplay()
-
+    Private Sub StereoProjectionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles StereoProjectionToolStripMenuItem.Click
+        my_params.view_stereo = StereoProjectionToolStripMenuItem.Checked
+        SatWindow.VIEWSTEREO = StereoProjectionToolStripMenuItem.Checked
     End Sub
 
-    Private Sub TimerS_Tick(sender As Object, e As EventArgs) Handles TimerS.Tick
-
-        If SatWindow.SHOWSTARS Then
-            'AstroGR.initstar()
-            SatWindow.initStarD()
-        End If
-        RealTimeDisplay()
-
+    Private Sub FilterByMagToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FilterByMagToolStripMenuItem.Click
+        my_params.sat_limit = FilterByMagToolStripMenuItem.Checked
     End Sub
 
     Private Sub NUpDownSec_ValueChanged(sender As Object, e As EventArgs) Handles NUpDownSec.ValueChanged
-
-        'setPMTimeOffset()
-        If NUpDownSec.Value = 60 Then
+ 
+        If NUpDownSec.Value >= 60 Then
             NUpDownSec.Value = 0
             NUpDownMin.Value += 1
         End If
-        If NUpDownSec.Value = -60 Then
+        If NUpDownSec.Value <= -60 Then
             NUpDownSec.Value = 0
             NUpDownMin.Value -= 1
         End If
@@ -1193,18 +1216,18 @@ Public Class SeeSatVBmain
     Private Sub NUpDownMin_ValueChanged(sender As Object, e As EventArgs) Handles NUpDownMin.ValueChanged
 
         'setPMTimeOffset()
-        If NUpDownMin.Value = 60 Then
+        If NUpDownMin.Value >= 60 Then
             NUpDownMin.Value = 0
-            NUpDownHr.Value += 1
+            If NUpDownHr.Value < NUpDownHr.Maximum Then
+                NUpDownHr.Value += 1
+            End If
         End If
-        If NUpDownMin.Value = -60 Then
+        If NUpDownMin.Value <= -60 Then
             NUpDownMin.Value = 0
-            NUpDownHr.Value -= 1
+            If NUpDownHr.Value > NUpDownHr.Minimum Then
+                NUpDownHr.Value -= 1
+            End If
         End If
-    End Sub
-
-    Private Sub NUpDownHr_ValueChanged(sender As Object, e As EventArgs) Handles NUpDownHr.ValueChanged
-        'setPMTimeOffset()
     End Sub
 
     Private Sub NUpDownHr_Leave(sender As Object, e As EventArgs) Handles NUpDownHr.Leave
@@ -1221,21 +1244,108 @@ Public Class SeeSatVBmain
 
     ' recalculate and update up/down time selectors
     Private Sub setPMTimeOffset()
-        PMTOFFSET = NUpDownHr.Value + NUpDownMin.Value / 60 + NUpDownSec.Value / 3600
-        NUpDownHr.Value = CDec(Fix(PMTOFFSET))
-        NUpDownMin.Value = CDec(Fix((PMTOFFSET - NUpDownHr.Value) * 60))
-        NUpDownSec.Value = CDec(Fix(((PMTOFFSET - NUpDownHr.Value) - NUpDownMin.Value / 60) * 3600))
+        PMTOFFSET = NUpDownHr.Value / DefConst.HRPERDAY + NUpDownMin.Value / DefConst.MINPERDAY + NUpDownSec.Value / DefConst.SECPERDAY
+        setUpDown_Values()
+        If CheckBoxUTC.Checked Then
+            DateTimePickerST.Value = DateTime.UtcNow.AddDays(PMTOFFSET)
+        Else
+            DateTimePickerST.Value = DateTime.Now.AddDays(PMTOFFSET)
+        End If
     End Sub
 
-    Private Sub RadioButtonPM_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButtonPM.CheckedChanged
+    Private Sub setUpDown_Values()
+        NUpDownHr.Value = CDec(Fix(PMTOFFSET * DefConst.HRPERDAY))
+        NUpDownMin.Value = CDec(Fix((PMTOFFSET - NUpDownHr.Value / DefConst.HRPERDAY) * DefConst.MINPERDAY))
+        NUpDownSec.Value = CDec(Fix((PMTOFFSET - NUpDownHr.Value / DefConst.HRPERDAY - NUpDownMin.Value / DefConst.MINPERDAY) * DefConst.SECPERDAY))
+    End Sub
+
+    Private Sub RadioButtonPM_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButtonPM.CheckedChanged, RadioButtonRT.CheckedChanged
         ' predict mode
+        PM_CheckToggle()
+    End Sub
+
+    Private Sub PM_CheckToggle()
         If RadioButtonPM.Checked Then
             GroupBoxPM.Enabled = True
             GroupBoxTS.Enabled = True
+            restart_pmode()
         Else
             GroupBoxPM.Enabled = False
             GroupBoxTS.Enabled = False
         End If
+    End Sub
+
+    Private Sub RadioButtonTO_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButtonTO.CheckedChanged
+        ' time offset mode
+        TO_CheckToggle()
+    End Sub
+
+    Private Sub TO_CheckToggle()
+        If RadioButtonTO.Checked Then
+            CheckBoxUTC.Enabled = False
+            DateTimePickerST.Enabled = False
+            NUpDownHr.Enabled = True
+            NUpDownMin.Enabled = True
+            NUpDownSec.Enabled = True
+        Else
+            CheckBoxUTC.Enabled = True
+            DateTimePickerST.Enabled = True
+            NUpDownHr.Enabled = False
+            NUpDownMin.Enabled = False
+            NUpDownSec.Enabled = False
+        End If
+        restart_pmode()
+    End Sub
+
+    Private Sub DateTimePickerST_ValueChanged(sender As Object, e As EventArgs) Handles DateTimePickerST.ValueChanged
+        'can't check if changed so set a global
+        dateChanged = True
+    End Sub
+
+    Private Sub DateTimePickerST_Leave(sender As Object, e As EventArgs) Handles DateTimePickerST.Leave, CheckBoxUTC.CheckedChanged
+        'set the time offset
+        If dateChanged Or (sender Is CheckBoxUTC) Then
+            DateTimePickerST_action()
+        End If
+    End Sub
+
+    Private Sub DateTimePickerST_action()
+        dateChanged = False
+        Dim TimeDiff As TimeSpan = DateTimePickerST.Value.Subtract(DateTime.UtcNow)
+        If Not CheckBoxUTC.Checked Then
+            TimeDiff = TimeDiff.Subtract(New TimeSpan(CInt(my_loc.tz_offset), 0, 0))
+        End If
+        PMTOFFSET = TimeDiff.TotalDays
+        setUpDown_Values()
+    End Sub
+
+    Private Sub restart_pmode()
+        'restart predict mode time offset
+        If RadioButtonRT.Checked Then
+            Exit Sub
+        End If
+        If RadioButtonST.Checked Then
+            DateTimePickerST_action()
+        Else
+            setPMTimeOffset()
+        End If
+    End Sub
+
+    ' realtime timer - on each tick calls the realtimedisplay routine
+    Private Sub TimerR_Tick(sender As Object, e As EventArgs) Handles TimerR.Tick
+        'TimerR.Enabled = False
+        RealTimeDisplay()
+
+    End Sub
+
+    Private Sub TimerS_Tick(sender As Object, e As EventArgs) Handles TimerS.Tick
+
+        If SatWindow.SHOWSTARS Then
+            'AstroGR.initstar()
+            SatWindow.initStarD()
+        End If
+        RealTimeDisplay()
+
     End Sub
 
 End Class
@@ -1289,4 +1399,6 @@ Public Class prog_params
     Public view_stereo As Boolean   'use a sterographic projection
     Public center_onzoom As Boolean   ' when zooming in center the mouse
     Public ntp_onstart As Boolean   'attempt to get NTP time on startup
+    Public sat_mag As Double        'the limting magnitude of the sats to display
+    Public sat_limit As Boolean     'use the limiting mag on the sats
 End Class

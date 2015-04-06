@@ -29,6 +29,7 @@ Partial Class SatWindow
         Me.TextBoxS = New System.Windows.Forms.TextBox()
         Me.StatusStripSW = New System.Windows.Forms.StatusStrip()
         Me.ToolStripSLMouseXY = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ToolStripSLTime = New System.Windows.Forms.ToolStripStatusLabel()
         Me.StatusStripSW.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -61,19 +62,28 @@ Partial Class SatWindow
         '
         'StatusStripSW
         '
-        Me.StatusStripSW.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripSLMouseXY})
-        Me.StatusStripSW.Location = New System.Drawing.Point(0, 620)
+        Me.StatusStripSW.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripSLTime, Me.ToolStripSLMouseXY})
+        Me.StatusStripSW.Location = New System.Drawing.Point(0, 618)
         Me.StatusStripSW.Name = "StatusStripSW"
-        Me.StatusStripSW.Size = New System.Drawing.Size(670, 22)
+        Me.StatusStripSW.Size = New System.Drawing.Size(670, 24)
         Me.StatusStripSW.TabIndex = 1
         Me.StatusStripSW.Text = "StatusStrip1"
         '
         'ToolStripSLMouseXY
         '
         Me.ToolStripSLMouseXY.BackColor = System.Drawing.SystemColors.Control
+        Me.ToolStripSLMouseXY.Margin = New System.Windows.Forms.Padding(2, 3, 2, 2)
         Me.ToolStripSLMouseXY.Name = "ToolStripSLMouseXY"
-        Me.ToolStripSLMouseXY.Size = New System.Drawing.Size(50, 17)
-        Me.ToolStripSLMouseXY.Text = "Holding"
+        Me.ToolStripSLMouseXY.Size = New System.Drawing.Size(81, 17)
+        Me.ToolStripSLMouseXY.Text = "MouseCoords"
+        '
+        'ToolStripSLTime
+        '
+        Me.ToolStripSLTime.BackColor = System.Drawing.SystemColors.Control
+        Me.ToolStripSLTime.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right
+        Me.ToolStripSLTime.Name = "ToolStripSLTime"
+        Me.ToolStripSLTime.Size = New System.Drawing.Size(59, 19)
+        Me.ToolStripSLTime.Text = "RunTime"
         '
         'SatWindow
         '
@@ -100,4 +110,5 @@ Partial Class SatWindow
     Friend WithEvents TextBoxS As System.Windows.Forms.TextBox
     Friend WithEvents StatusStripSW As System.Windows.Forms.StatusStrip
     Friend WithEvents ToolStripSLMouseXY As System.Windows.Forms.ToolStripStatusLabel
+    Friend WithEvents ToolStripSLTime As System.Windows.Forms.ToolStripStatusLabel
 End Class

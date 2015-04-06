@@ -42,9 +42,12 @@ Partial Class SeeSatVBmain
         Me.SetNTPTimeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SetNowToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.OnStartUpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.VisualToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.StereoProjectionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.FilterByMagToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SaveDefaultsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TimerS = New System.Windows.Forms.Timer(Me.components)
-        Me.DateTimePickerRT = New System.Windows.Forms.DateTimePicker()
+        Me.DateTimePickerST = New System.Windows.Forms.DateTimePicker()
         Me.CheckBoxUTC = New System.Windows.Forms.CheckBox()
         Me.RadioButtonPM = New System.Windows.Forms.RadioButton()
         Me.RadioButtonRT = New System.Windows.Forms.RadioButton()
@@ -170,7 +173,7 @@ Partial Class SeeSatVBmain
         '
         'OptionsToolStripMenuItem
         '
-        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserLocationToolStripMenuItem, Me.SetNTPTimeToolStripMenuItem, Me.SaveDefaultsToolStripMenuItem})
+        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserLocationToolStripMenuItem, Me.SetNTPTimeToolStripMenuItem, Me.VisualToolStripMenuItem, Me.SaveDefaultsToolStripMenuItem})
         Me.OptionsToolStripMenuItem.Name = "OptionsToolStripMenuItem"
         Me.OptionsToolStripMenuItem.Size = New System.Drawing.Size(61, 20)
         Me.OptionsToolStripMenuItem.Text = "Options"
@@ -186,20 +189,41 @@ Partial Class SeeSatVBmain
         Me.SetNTPTimeToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SetNowToolStripMenuItem, Me.OnStartUpToolStripMenuItem})
         Me.SetNTPTimeToolStripMenuItem.Name = "SetNTPTimeToolStripMenuItem"
         Me.SetNTPTimeToolStripMenuItem.Size = New System.Drawing.Size(161, 22)
-        Me.SetNTPTimeToolStripMenuItem.Text = "Set NTP Time"
+        Me.SetNTPTimeToolStripMenuItem.Text = "NTP Time"
         '
         'SetNowToolStripMenuItem
         '
         Me.SetNowToolStripMenuItem.Name = "SetNowToolStripMenuItem"
-        Me.SetNowToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.SetNowToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
         Me.SetNowToolStripMenuItem.Text = "Set Now"
         '
         'OnStartUpToolStripMenuItem
         '
         Me.OnStartUpToolStripMenuItem.CheckOnClick = True
         Me.OnStartUpToolStripMenuItem.Name = "OnStartUpToolStripMenuItem"
-        Me.OnStartUpToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.OnStartUpToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
         Me.OnStartUpToolStripMenuItem.Text = "On Start Up"
+        '
+        'VisualToolStripMenuItem
+        '
+        Me.VisualToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.StereoProjectionToolStripMenuItem, Me.FilterByMagToolStripMenuItem})
+        Me.VisualToolStripMenuItem.Name = "VisualToolStripMenuItem"
+        Me.VisualToolStripMenuItem.Size = New System.Drawing.Size(161, 22)
+        Me.VisualToolStripMenuItem.Text = "Visual"
+        '
+        'StereoProjectionToolStripMenuItem
+        '
+        Me.StereoProjectionToolStripMenuItem.CheckOnClick = True
+        Me.StereoProjectionToolStripMenuItem.Name = "StereoProjectionToolStripMenuItem"
+        Me.StereoProjectionToolStripMenuItem.Size = New System.Drawing.Size(164, 22)
+        Me.StereoProjectionToolStripMenuItem.Text = "Stereo Projection"
+        '
+        'FilterByMagToolStripMenuItem
+        '
+        Me.FilterByMagToolStripMenuItem.CheckOnClick = True
+        Me.FilterByMagToolStripMenuItem.Name = "FilterByMagToolStripMenuItem"
+        Me.FilterByMagToolStripMenuItem.Size = New System.Drawing.Size(164, 22)
+        Me.FilterByMagToolStripMenuItem.Text = "Filter by Mag"
         '
         'SaveDefaultsToolStripMenuItem
         '
@@ -210,19 +234,19 @@ Partial Class SeeSatVBmain
         'TimerS
         '
         '
-        'DateTimePickerRT
+        'DateTimePickerST
         '
-        Me.DateTimePickerRT.CustomFormat = "MM/dd/yyyy - HH:mm:ss"
-        Me.DateTimePickerRT.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.DateTimePickerRT.Location = New System.Drawing.Point(92, 16)
-        Me.DateTimePickerRT.Name = "DateTimePickerRT"
-        Me.DateTimePickerRT.Size = New System.Drawing.Size(157, 20)
-        Me.DateTimePickerRT.TabIndex = 5
+        Me.DateTimePickerST.CustomFormat = "MM/dd/yyyy - HH:mm:ss"
+        Me.DateTimePickerST.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.DateTimePickerST.Location = New System.Drawing.Point(69, 15)
+        Me.DateTimePickerST.Name = "DateTimePickerST"
+        Me.DateTimePickerST.Size = New System.Drawing.Size(157, 20)
+        Me.DateTimePickerST.TabIndex = 5
         '
         'CheckBoxUTC
         '
         Me.CheckBoxUTC.AutoSize = True
-        Me.CheckBoxUTC.Location = New System.Drawing.Point(36, 16)
+        Me.CheckBoxUTC.Location = New System.Drawing.Point(13, 15)
         Me.CheckBoxUTC.Name = "CheckBoxUTC"
         Me.CheckBoxUTC.Size = New System.Drawing.Size(48, 17)
         Me.CheckBoxUTC.TabIndex = 8
@@ -303,9 +327,9 @@ Partial Class SeeSatVBmain
         '
         'NUpDownHr
         '
-        Me.NUpDownHr.Location = New System.Drawing.Point(37, 39)
-        Me.NUpDownHr.Maximum = New Decimal(New Integer() {96, 0, 0, 0})
-        Me.NUpDownHr.Minimum = New Decimal(New Integer() {96, 0, 0, -2147483648})
+        Me.NUpDownHr.Location = New System.Drawing.Point(33, 37)
+        Me.NUpDownHr.Maximum = New Decimal(New Integer() {8784, 0, 0, 0})
+        Me.NUpDownHr.Minimum = New Decimal(New Integer() {8784, 0, 0, -2147483648})
         Me.NUpDownHr.Name = "NUpDownHr"
         Me.NUpDownHr.Size = New System.Drawing.Size(47, 20)
         Me.NUpDownHr.TabIndex = 13
@@ -313,28 +337,28 @@ Partial Class SeeSatVBmain
         '
         'NUpDownMin
         '
-        Me.NUpDownMin.Location = New System.Drawing.Point(117, 39)
+        Me.NUpDownMin.Location = New System.Drawing.Point(115, 37)
         Me.NUpDownMin.Maximum = New Decimal(New Integer() {60, 0, 0, 0})
         Me.NUpDownMin.Minimum = New Decimal(New Integer() {60, 0, 0, -2147483648})
         Me.NUpDownMin.Name = "NUpDownMin"
-        Me.NUpDownMin.Size = New System.Drawing.Size(47, 20)
+        Me.NUpDownMin.Size = New System.Drawing.Size(36, 20)
         Me.NUpDownMin.TabIndex = 14
         Me.NUpDownMin.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'NUpDownSec
         '
-        Me.NUpDownSec.Location = New System.Drawing.Point(202, 39)
+        Me.NUpDownSec.Location = New System.Drawing.Point(189, 37)
         Me.NUpDownSec.Maximum = New Decimal(New Integer() {60, 0, 0, 0})
         Me.NUpDownSec.Minimum = New Decimal(New Integer() {60, 0, 0, -2147483648})
         Me.NUpDownSec.Name = "NUpDownSec"
-        Me.NUpDownSec.Size = New System.Drawing.Size(47, 20)
+        Me.NUpDownSec.Size = New System.Drawing.Size(36, 20)
         Me.NUpDownSec.TabIndex = 15
         Me.NUpDownSec.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'LabelHr
         '
         Me.LabelHr.AutoSize = True
-        Me.LabelHr.Location = New System.Drawing.Point(13, 41)
+        Me.LabelHr.Location = New System.Drawing.Point(9, 39)
         Me.LabelHr.Name = "LabelHr"
         Me.LabelHr.Size = New System.Drawing.Size(18, 13)
         Me.LabelHr.TabIndex = 16
@@ -343,7 +367,7 @@ Partial Class SeeSatVBmain
         'LabelMin
         '
         Me.LabelMin.AutoSize = True
-        Me.LabelMin.Location = New System.Drawing.Point(89, 41)
+        Me.LabelMin.Location = New System.Drawing.Point(85, 39)
         Me.LabelMin.Name = "LabelMin"
         Me.LabelMin.Size = New System.Drawing.Size(24, 13)
         Me.LabelMin.TabIndex = 17
@@ -352,7 +376,7 @@ Partial Class SeeSatVBmain
         'LabelSec
         '
         Me.LabelSec.AutoSize = True
-        Me.LabelSec.Location = New System.Drawing.Point(170, 41)
+        Me.LabelSec.Location = New System.Drawing.Point(157, 39)
         Me.LabelSec.Name = "LabelSec"
         Me.LabelSec.Size = New System.Drawing.Size(26, 13)
         Me.LabelSec.TabIndex = 18
@@ -360,7 +384,7 @@ Partial Class SeeSatVBmain
         '
         'GroupBoxTS
         '
-        Me.GroupBoxTS.Controls.Add(Me.DateTimePickerRT)
+        Me.GroupBoxTS.Controls.Add(Me.DateTimePickerST)
         Me.GroupBoxTS.Controls.Add(Me.LabelSec)
         Me.GroupBoxTS.Controls.Add(Me.CheckBoxUTC)
         Me.GroupBoxTS.Controls.Add(Me.LabelMin)
@@ -370,7 +394,7 @@ Partial Class SeeSatVBmain
         Me.GroupBoxTS.Controls.Add(Me.NUpDownSec)
         Me.GroupBoxTS.Location = New System.Drawing.Point(122, 387)
         Me.GroupBoxTS.Name = "GroupBoxTS"
-        Me.GroupBoxTS.Size = New System.Drawing.Size(258, 70)
+        Me.GroupBoxTS.Size = New System.Drawing.Size(246, 70)
         Me.GroupBoxTS.TabIndex = 19
         Me.GroupBoxTS.TabStop = False
         '
@@ -421,7 +445,7 @@ Partial Class SeeSatVBmain
     Friend WithEvents AllDefaultFilesToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents SaveDefaultsToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents TimerS As System.Windows.Forms.Timer
-    Friend WithEvents DateTimePickerRT As System.Windows.Forms.DateTimePicker
+    Friend WithEvents DateTimePickerST As System.Windows.Forms.DateTimePicker
     Friend WithEvents CheckBoxUTC As System.Windows.Forms.CheckBox
     Friend WithEvents RadioButtonPM As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButtonRT As System.Windows.Forms.RadioButton
@@ -442,5 +466,8 @@ Partial Class SeeSatVBmain
     Friend WithEvents GroupBoxTS As System.Windows.Forms.GroupBox
     Friend WithEvents SetNowToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents OnStartUpToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents VisualToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents StereoProjectionToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents FilterByMagToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class

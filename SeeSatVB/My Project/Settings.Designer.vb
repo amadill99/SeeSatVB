@@ -210,27 +210,51 @@ Namespace My
             End Set
         End Property
         
-        <Global.System.Configuration.UserScopedSettingAttribute(), _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
-         Global.System.Configuration.DefaultSettingValueAttribute("False")> _
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
         Public Property user_ntp_onstart() As Boolean
             Get
-                Return CType(Me("user_ntp_onstart"), Boolean)
+                Return CType(Me("user_ntp_onstart"),Boolean)
             End Get
-            Set(value As Boolean)
+            Set
                 Me("user_ntp_onstart") = value
             End Set
         End Property
-
-        <Global.System.Configuration.UserScopedSettingAttribute(), _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
-         Global.System.Configuration.DefaultSettingValueAttribute("False")> _
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
         Public Property user_center_onzoom() As Boolean
             Get
-                Return CType(Me("user_center_onzoom"), Boolean)
+                Return CType(Me("user_center_onzoom"),Boolean)
             End Get
-            Set(value As Boolean)
+            Set
                 Me("user_center_onzoom") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("8")>  _
+        Public Property user_sat_mag() As Double
+            Get
+                Return CType(Me("user_sat_mag"),Double)
+            End Get
+            Set
+                Me("user_sat_mag") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property user_sat_limit() As Boolean
+            Get
+                Return CType(Me("user_sat_limit"),Boolean)
+            End Get
+            Set
+                Me("user_sat_limit") = value
             End Set
         End Property
     End Class

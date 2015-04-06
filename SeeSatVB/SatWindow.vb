@@ -29,6 +29,7 @@ Public Class SatWindow
     Public Shared mouse_xy As Point     ' the current cursor position
     Public Shared mouse_xy_old As Point ' the previous cursor position
     Public Shared mouse_xy_user As Point    ' the user space coordinates of the cursor
+    Public Shared mouse_xy_click As Point     ' the cursor position when the left mouse button went down
 
     'Public Shared tPen As Integer = 1        ' tiny pen
     'Public Shared sPen As Integer = 2        ' small pen
@@ -441,12 +442,15 @@ Public Class SatWindow
 
         p = New Pen(SatColor, tPen)
 
-        Select Case mag
-            Case Is > 8.0
-                i = STZ
-            Case Else
-                i = CInt((-mag + 8) * STZ)
-        End Select
+        'Select Case mag
+        '    Case Is > 8.0
+        '        i = STZ
+        '    Case Else
+        '        i = CInt((-mag + 8) * STZ)
+        'End Select
+
+        ' using the previous formula mag 8.5 was brighter than mag 7.5
+        i = Math.Max(CInt((-mag + 8) * STZ), 4)
 
         rval = AddDSat(SatNdx, p, New Rectangle(e - CInt(i / 2), n - CInt(i / 2), i, i))
 
@@ -826,16 +830,6 @@ Public Class SatWindow
         CalcDist = CInt(Math.Sqrt((xyM.X - xyS.X) ^ 2 + (xyM.Y - xyS.Y) ^ 2))
 
     End Function
-    ' refreshes the screen
-    Private Sub TimerR_Tick(sender As Object, e As EventArgs) Handles TimerR.Tick
-        'Timer1.Interval = 1000
-
-        If SatIsDirty = True Or StarIsDirty = True Then
-            Show_ToolTip()
-            Me.Refresh()
-        End If
-
-    End Sub
 
     Private Sub Show_ToolTip()
 
@@ -872,13 +866,6 @@ Public Class SatWindow
         Else
             ToolTipSat.Hide(Me)
         End If
-
-    End Sub
-
-    ' shows the tooltip if the mouse has been stationary
-    Private Sub TimerM_Tick(sender As Object, e As EventArgs) Handles TimerM.Tick
-
-        Show_ToolTip()
 
     End Sub
 
@@ -927,9 +914,33 @@ Public Class SatWindow
                     SeeSatVBmain.satellites(sndx).tle0.magflg + vbNewLine)
 
             End If
+            mouse_xy_click = e.Location
         End If
     End Sub
 
+    ' pan the window
+    Private Sub SatWindow_MouseUp(sender As Object, e As MouseEventArgs) Handles MyBase.MouseUp
+
+        If WSCALE = 1 Or e.Y < CanvasBounds.Top Or e.Y > CanvasBounds.Bottom Or e.X < CanvasBounds.Left Or e.X > CanvasBounds.Right Then
+            Exit Sub
+        End If
+
+        If (e.Button = Windows.Forms.MouseButtons.Left) Then
+            If Math.Sqrt((e.Location.X - mouse_xy_click.X) ^ 2 + (e.Location.Y - mouse_xy_click.Y) ^ 2) > MJITTER Then ' the mouse has moved more than jitter
+                WXOFFSET = CInt(((mouse_xy_click.X - grMatrix.OffsetX) / grMatrix.Elements(0)))
+                WYOFFSET = CInt(((mouse_xy_click.Y - grMatrix.OffsetY) / grMatrix.Elements(3)))
+
+                If WXOFFSET < -WSIZE Then
+                    WXOFFSET = -WSIZE
+                End If
+
+                If WYOFFSET < -WSIZE Then
+                    WYOFFSET = -WSIZE
+                End If
+            End If
+        End If
+
+    End Sub
     'Private Sub SatWindow_MouseDown(sender As Object, e As MouseEventArgs) Handles MyBase.MouseDown
     '    If (e.Button = Windows.Forms.MouseButtons.Right) Then
     '        WSCALE = WSCALE / 2
@@ -975,7 +986,7 @@ Public Class SatWindow
         End If
         If e.Delta > 0 And WSCALE < WMAXSCALE Then
             WSCALE += 1
-            ' move the cursor to the center of the window if zooming in
+            ' move the mouse cursor to the center of the window if zooming in
             If SeeSatVBmain.my_params.center_onzoom Then
                 Windows.Forms.Cursor.Position = New Point(CInt(Bounds.X + (CanvasBounds.Left * 2 + CanvasBounds.Right) / 2), CInt(Bounds.Y + (CanvasBounds.Top * 2 + CanvasBounds.Bottom) / 2))
             End If
@@ -1052,5 +1063,24 @@ Public Class SatWindow
         End If
     End Sub
 
+    ' shows the tooltip if the mouse has been stationary
+    Private Sub TimerM_Tick(sender As Object, e As EventArgs) Handles TimerM.Tick
+
+        Show_ToolTip()
+
+    End Sub
+
+    ' refreshes the screen
+    Private Sub TimerR_Tick(sender As Object, e As EventArgs) Handles TimerR.Tick
+        'Timer1.Interval = 1000
+
+        If SatIsDirty = True Or StarIsDirty = True Then
+            Show_ToolTip()
+            Me.Refresh()
+        End If
+
+        ToolStripSLTime.Text = SeeSatVBmain.TIMENOW.ToLocalTime.ToShortDateString + " " + SeeSatVBmain.TIMENOW.ToLocalTime.ToLongTimeString
+
+    End Sub
 
 End Class
