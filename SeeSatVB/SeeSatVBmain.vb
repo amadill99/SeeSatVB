@@ -381,6 +381,14 @@ Public Class SeeSatVBmain
 
         TextBox1.AppendText("library version returned " + outs + vbNewLine)
 
+        TextBox1.AppendText("System clock: " + DateTime.UtcNow.ToString + " UTC" + vbNewLine)
+        TextBox1.AppendText("System clock: " + CStr(DateTime.Now.ToString) + " Local" + vbNewLine)
+        TextBox1.AppendText("Daylight savings: " + CStr(DateTime.Now.IsDaylightSavingTime) + vbNewLine)
+        TextBox1.AppendText("SYSCLOCKERR: " + CStr(SYSCLOCKERR) + " PMTOFFSET: " + CStr(PMTOFFSET) + vbNewLine + " TIMENOW: " + CStr(TIMENOW) + vbNewLine)
+        TextBox1.AppendText("my_loc.tz_offset: " + CStr(my_loc.tz_offset) + vbNewLine)
+        TextBox1.AppendText("TimeZoneInfo.Local.Id: " + TimeZoneInfo.Local.Id + " DisplayName: " + TimeZoneInfo.Local.DisplayName + vbNewLine)
+        TextBox1.AppendText("TimeZoneInfo.Local.BaseUtcOffset: " + TimeZoneInfo.Local.BaseUtcOffset.ToString + vbNewLine)
+
         'chk_rval(SatIO.ReadTLE(my_files.tle_path), my_files.tle_path)
         'tle_test(satellites(1).sat_params(0), satellites(1).tle, CInt(version))
         'testTimeserver()
@@ -612,6 +620,14 @@ Public Class SeeSatVBmain
 
         For sndx = 1 To SatNdx  'go once through the list
 
+            TIMENOW = DateTime.UtcNow
+            TIMENOW = TIMENOW.AddMilliseconds(SYSCLOCKERR)
+            If RadioButtonPM.Checked Then
+                TIMENOW = TIMENOW.AddDays(PMTOFFSET)
+            End If
+
+            JDPUB = Date2Julian(TIMENOW)
+
             If Not satellites(sndx).is_valid Then
                 Continue For
             End If
@@ -620,14 +636,6 @@ Public Class SeeSatVBmain
                 satellites(sndx).tag += 1
                 Continue For
             End If
-
-            TIMENOW = DateTime.UtcNow
-            TIMENOW = TIMENOW.AddMilliseconds(SYSCLOCKERR)
-            If RadioButtonPM.Checked Then
-                TIMENOW = TIMENOW.AddDays(PMTOFFSET)
-            End If
-
-            JDPUB = Date2Julian(TIMENOW)
 
             ' not sure if the next line is required
             _lat_alt_to_parallax(my_loc.lat_rad, my_loc.ht_in_meters, rho_cos_phi, rho_sin_phi)

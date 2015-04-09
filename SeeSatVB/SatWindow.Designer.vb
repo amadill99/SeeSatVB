@@ -28,8 +28,8 @@ Partial Class SatWindow
         Me.TimerM = New System.Windows.Forms.Timer(Me.components)
         Me.TextBoxS = New System.Windows.Forms.TextBox()
         Me.StatusStripSW = New System.Windows.Forms.StatusStrip()
-        Me.ToolStripSLMouseXY = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripSLTime = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ToolStripSLMouseXY = New System.Windows.Forms.ToolStripStatusLabel()
         Me.StatusStripSW.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -52,8 +52,10 @@ Partial Class SatWindow
         '
         'TextBoxS
         '
+        Me.TextBoxS.BackColor = System.Drawing.SystemColors.WindowText
         Me.TextBoxS.Dock = System.Windows.Forms.DockStyle.Right
         Me.TextBoxS.Enabled = False
+        Me.TextBoxS.ForeColor = System.Drawing.SystemColors.GrayText
         Me.TextBoxS.Location = New System.Drawing.Point(670, 0)
         Me.TextBoxS.Multiline = True
         Me.TextBoxS.Name = "TextBoxS"
@@ -69,14 +71,6 @@ Partial Class SatWindow
         Me.StatusStripSW.TabIndex = 1
         Me.StatusStripSW.Text = "StatusStrip1"
         '
-        'ToolStripSLMouseXY
-        '
-        Me.ToolStripSLMouseXY.BackColor = System.Drawing.SystemColors.Control
-        Me.ToolStripSLMouseXY.Margin = New System.Windows.Forms.Padding(2, 3, 2, 2)
-        Me.ToolStripSLMouseXY.Name = "ToolStripSLMouseXY"
-        Me.ToolStripSLMouseXY.Size = New System.Drawing.Size(81, 17)
-        Me.ToolStripSLMouseXY.Text = "MouseCoords"
-        '
         'ToolStripSLTime
         '
         Me.ToolStripSLTime.BackColor = System.Drawing.SystemColors.Control
@@ -84,6 +78,14 @@ Partial Class SatWindow
         Me.ToolStripSLTime.Name = "ToolStripSLTime"
         Me.ToolStripSLTime.Size = New System.Drawing.Size(59, 19)
         Me.ToolStripSLTime.Text = "RunTime"
+        '
+        'ToolStripSLMouseXY
+        '
+        Me.ToolStripSLMouseXY.BackColor = System.Drawing.SystemColors.Control
+        Me.ToolStripSLMouseXY.Margin = New System.Windows.Forms.Padding(2, 3, 2, 2)
+        Me.ToolStripSLMouseXY.Name = "ToolStripSLMouseXY"
+        Me.ToolStripSLMouseXY.Size = New System.Drawing.Size(81, 19)
+        Me.ToolStripSLMouseXY.Text = "MouseCoords"
         '
         'SatWindow
         '
