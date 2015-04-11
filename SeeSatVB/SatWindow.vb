@@ -55,10 +55,13 @@ Public Class SatWindow
     Public Shared starColorB As Color = Color.LightGray
 
     Public Shared LIMITMAG As Double = 8 ' smallest mag to display - change to 8
-    Public Shared SHOWSTARS As Boolean = False  ' paint routine uses this to decide to display stars
+    Public Shared ShowStars As Boolean = False  ' paint routine uses this to decide to display stars
 
-    Public Shared STZ As Integer = CInt(WSIZE * 0.002)  ' 20 - used int plotazel base satellite size
-    Public Shared SRZ As Integer = CInt(WSIZE * 0.001)  ' 10 - used int plotazel base star size
+
+    Public Shared SATSCALE As Integer = SeeSatVBmain.my_params.sat_scale    ' scale factor for satellites - nominally 10
+    Public Shared STARSCALE As Integer = SeeSatVBmain.my_params.star_scale  ' scale factor for stars - nominally 10
+    Public Shared SatSize As Integer = CInt(WSIZE * 0.0002 * SATSCALE)      ' 20 - used int plotazel base satellite size
+    Public Shared StarSize As Integer = CInt(WSIZE * 0.0001 * STARSCALE)    ' 10 - used int plotazel base star size
 
     Public Shared SatIsDirty As Boolean = False    ' our graphics area has changed
     Public Shared FirstTime As Boolean = True   ' we haven't drawn anything
@@ -89,6 +92,7 @@ Public Class SatWindow
 
     ' these structures hold the graphic representation of our stars
     Public Structure structStarD
+        Public sname As String      ' name
         Public isActive As Boolean  ' set to false not to display, not initialized, or reuse
         Public mag As Double
         Public p As Pen             ' pen information
@@ -97,6 +101,9 @@ Public Class SatWindow
 
     Public Shared StarsD() As structStarD
 
+    Private Sub SatWindow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+    End Sub
 
     Private Sub SatWindow_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
 
@@ -112,7 +119,7 @@ Public Class SatWindow
 
         TextBoxS.Width = CInt(CanvasTotal.Width - (CanvasBounds.Left + CanvasBounds.Right))
 
-        If SHOWSTARS = True And StarIsDirty = True And FirstTime = False Then
+        If ShowStars = True And StarIsDirty = True And FirstTime = False Then
             DrawAllStars(e.Graphics)
             StarIsDirty = False
         End If
@@ -226,12 +233,12 @@ Public Class SatWindow
 
         Dim n As Integer
         Dim e As Integer
-        Dim rval As Integer
+        'Dim rval As Integer
         Dim dist As Integer
 
         'C++ TO VB CONVERTER NOTE: 'extern' variable declarations are not required in VB:
         '	extern Integer elsusa
-        Dim StarColor As Color
+        'Dim StarColor As Color
         Dim i As Integer
 
         Dim p As Pen = New Pen(Color.Black)
@@ -263,29 +270,32 @@ Public Class SatWindow
         Select Case starxy.mag
             Case Is > 8.0
                 p.Width = tPen
-                p.Color = starColorF
+                'p.Color = starColorF
             Case 6.0 To 8.0
                 p.Width = tPen
-                p.Color = starColorF
+                'p.Color = starColorF
             Case 4.0 To 6.0
                 p.Width = mPen
-                p.Color = starColorF
+                'p.Color = starColorF
             Case 2.5 To 4.0
                 p.Width = mPen
-                p.Color = starColorM
+                'p.Color = starColorM
             Case 1 To 2.5
                 p.Width = mPen
-                p.Color = starColorB
+                'p.Color = starColorB
             Case Is < 1
                 p.Width = bPen
-                p.Color = starColorB
+                'p.Color = starColorB
         End Select
+
+        p.Color = Color.FromArgb(starxy.colors(0), starxy.colors(1), starxy.colors(2), starxy.colors(3))
+        'p.Color.A = 128
 
         Select Case starxy.mag
             Case Is > 8.0
-                i = SRZ
+                i = StarSize
             Case Else
-                i = CInt((-starxy.mag + 8) * SRZ)
+                i = CInt((-starxy.mag + 8) * StarSize)
         End Select
 
         'StarE = (true, p, New Rectangle(e - CInt(i / 2), n - CInt(i / 2), i, i))
@@ -322,6 +332,7 @@ Public Class SatWindow
 
                 Dim starE As New structStarD
                 plotstar(starxy, starE)
+                starE.sname = SatIO.stars(i).name
                 StarsD(ndx) = starE
                 ndx += 1
             End If
@@ -450,7 +461,8 @@ Public Class SatWindow
         'End Select
 
         ' using the previous formula mag 8.5 was brighter than mag 7.5
-        i = Math.Max(CInt((-mag + 8) * STZ), 4)
+        i = Math.Max(CInt((-mag + 8) * SatSize), 4)
+        'i = CInt((-mag + 8) * SatSize)
 
         rval = AddDSat(SatNdx, p, New Rectangle(e - CInt(i / 2), n - CInt(i / 2), i, i))
 
@@ -783,6 +795,46 @@ Public Class SatWindow
 
     End Sub
 
+    ' search through the display list and get the nearest active star and return the ID and distance to it
+    Private Sub FindNearestStar(ByVal xy As Point, ByRef sndx As Integer, ByRef distance As Integer)
+        ' a value of -1 for sndx indicates nothing found
+
+        Dim ndx As Integer = 1      ' the 0 element is never used
+        Dim start As Integer = 1    ' the first element to be checked
+        Dim faraway As Integer = 10000
+        Dim nearest As Integer = faraway  ' start with a really far distance
+        Dim thisdist As Integer
+        Dim last As Integer
+        Dim lmag As Double = 4.5 + WSCALE / 4
+
+        If StarsD Is Nothing Then
+            sndx = -1
+            distance = faraway
+            Exit Sub
+        End If
+
+        last = StarsD.Length - 1
+
+        For ndx = 1 To last
+            If StarsD(ndx).isActive = True AndAlso StarsD(ndx).mag < lmag Then
+
+                thisdist = CalcDist(xy, StarsD(ndx).r.Location, nearest)
+                If thisdist < nearest Then
+                    nearest = thisdist
+                    sndx = ndx
+                End If
+            End If
+        Next
+
+        If nearest = faraway Then
+            sndx = -1
+            distance = faraway
+        Else
+            distance = nearest
+        End If
+
+    End Sub
+
     ' search through the display list and get the nearest active sat and return the ID and distance to it
     Private Sub FindNearestSat(ByVal xy As Point, ByRef sndx As Integer, ByRef distance As Integer)
         ' a value of -1 for sndx indicates nothing found
@@ -800,14 +852,14 @@ Public Class SatWindow
         End If
 
         If SatsD(ndx).isActive = True Then
-            nearest = CalcDist(xy, SatsD(ndx).SatsI(SatsD(ndx).ndxI).r.Location)
+            nearest = CalcDist(xy, SatsD(ndx).SatsI(SatsD(ndx).ndxI).r.Location, nearest)
             sndx = ndx
         End If
 
         If DListNext(ndx) = True Then
             start = ndx
             While DListNext(ndx) = True And start <> ndx
-                thisdist = CalcDist(xy, SatsD(ndx).SatsI(SatsD(ndx).ndxI).r.Location)
+                thisdist = CalcDist(xy, SatsD(ndx).SatsI(SatsD(ndx).ndxI).r.Location, nearest)
                 If thisdist < nearest Then
                     nearest = thisdist
                     sndx = ndx
@@ -825,13 +877,21 @@ Public Class SatWindow
     End Sub
 
     ' returns the distance between two graphics points
-    Private Function CalcDist(ByVal xyM As Point, xyS As Point) As Integer
+    Private Function CalcDist(ByVal xyM As Point, ByVal xyS As Point, Optional ByVal chkdist As Integer = 100000) As Integer
 
-        CalcDist = CInt(Math.Sqrt((xyM.X - xyS.X) ^ 2 + (xyM.Y - xyS.Y) ^ 2))
+        If Math.Abs(xyM.X - xyS.X) > chkdist Then
+            Return Math.Abs(xyM.X - xyS.X)
+        End If
+
+        If Math.Abs(xyM.Y - xyS.Y) > chkdist Then
+            Return Math.Abs(xyM.Y - xyS.Y)
+        End If
+
+        Return CInt(Math.Sqrt((xyM.X - xyS.X) ^ 2 + (xyM.Y - xyS.Y) ^ 2))
 
     End Function
 
-    Private Sub Show_ToolTip()
+    Private Sub Show_ToolTipSat()
 
         Dim distance, sndx As Integer
         Dim mindist As Integer = CInt(WSIZE * 0.02) ' minimum distance to sat
@@ -897,21 +957,39 @@ Public Class SatWindow
 
         If (e.Button = Windows.Forms.MouseButtons.Left) Then
 
-            FindNearestSat(mouse_xy_user, sndx, distance)
-            If distance < mindist Then
-                SeeSatVBmain.TextBox1.AppendText(vbNewLine + SeeSatVBmain.satellites(sndx).tlename + " / " + SeeSatVBmain.satellites(sndx).tle0.satname + _
-                    " - ID: " + CStr(SeeSatVBmain.satellites(sndx).tle.intl_desig) + " - N#: " + _
-                    CStr(SeeSatVBmain.satellites(sndx).tle.norad_number) + " - ElSet: " + SeeSatVBmain.satellites(sndx).elset + vbNewLine)
-                SeeSatVBmain.TextBox1.AppendText(" Time (UTC): " + AstroGR.Julian2Gregorian(SeeSatVBmain.JDPUB).ToString("MMM/dd/yyyy HH:mm:ss") + _
-                    " (Local):" + AstroGR.Julian2Gregorian(SeeSatVBmain.JDPUB + SeeSatVBmain.my_loc.tz_offset / DefConst.HRPERDAY).ToString("MMM/dd/yyyy HH:mm:ss") + vbNewLine)
-                SeeSatVBmain.TextBox1.AppendText(" Alt: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.phi * DefConst.RA2DE, 4)) + _
-                    " Azm: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.lambda * DefConst.RA2DE, 4)) + _
-                    " Dist: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.r * DefConst.EARTHR2KM, 1)) + " km" + vbNewLine)
-                SeeSatVBmain.TextBox1.AppendText(" RA: " + Parser.DecDegToHrString(SeeSatVBmain.satellites(sndx).view.radec.lambda * DefConst.RA2DE, "", 0) + _
-                    " Dec: " + Parser.DecDegToDMSString(SeeSatVBmain.satellites(sndx).view.radec.phi * DefConst.RA2DE, "N", 0))
-                SeeSatVBmain.TextBox1.AppendText(" Sun angle: " + CStr(SeeSatVBmain.satellites(sndx).view.elsusa) + " Illum: " + _
-                    CStr(CInt(SeeSatVBmain.satellites(sndx).view.illum * 100)) + "% Mag: " + CStr(SeeSatVBmain.satellites(sndx).view.truemag) + _
-                    SeeSatVBmain.satellites(sndx).tle0.magflg + vbNewLine)
+            If (Control.ModifierKeys = Keys.Control) Then
+
+                FindNearestStar(mouse_xy_user, sndx, distance)
+                If distance < mindist Then
+                    If Len(StarsD(sndx).sname) > 1 Then
+                        ToolTipSat.Show(StarsD(sndx).sname + vbNewLine + "Mag " + CStr(StarsD(sndx).mag), _
+                            Me, mouse_xy.X + 20, mouse_xy.Y + 20, 10000)
+                    Else
+                        ToolTipSat.Show("Mag " + CStr(StarsD(sndx).mag), _
+                                Me, mouse_xy.X + 20, mouse_xy.Y + 20, 10000)
+                    End If
+                    
+                End If
+
+            Else
+
+                FindNearestSat(mouse_xy_user, sndx, distance)
+                If distance < mindist Then
+                    SeeSatVBmain.TextBox1.AppendText(vbNewLine + SeeSatVBmain.satellites(sndx).tlename + " / " + SeeSatVBmain.satellites(sndx).tle0.satname + _
+                        " - ID: " + CStr(SeeSatVBmain.satellites(sndx).tle.intl_desig) + " - N#: " + _
+                        CStr(SeeSatVBmain.satellites(sndx).tle.norad_number) + " - ElSet: " + SeeSatVBmain.satellites(sndx).elset + vbNewLine)
+                    SeeSatVBmain.TextBox1.AppendText(" Time (UTC): " + AstroGR.Julian2Gregorian(SeeSatVBmain.JDPUB).ToString("MMM/dd/yyyy HH:mm:ss") + _
+                        " (Local):" + AstroGR.Julian2Gregorian(SeeSatVBmain.JDPUB + SeeSatVBmain.my_loc.tz_offset / DefConst.HRPERDAY).ToString("MMM/dd/yyyy HH:mm:ss") + vbNewLine)
+                    SeeSatVBmain.TextBox1.AppendText(" Alt: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.phi * DefConst.RA2DE, 4)) + _
+                        " Azm: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.lambda * DefConst.RA2DE, 4)) + _
+                        " Dist: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.r * DefConst.EARTHR2KM, 1)) + " km" + vbNewLine)
+                    SeeSatVBmain.TextBox1.AppendText(" RA: " + Parser.DecDegToHrString(SeeSatVBmain.satellites(sndx).view.radec.lambda * DefConst.RA2DE, "", 0) + _
+                        " Dec: " + Parser.DecDegToDMSString(SeeSatVBmain.satellites(sndx).view.radec.phi * DefConst.RA2DE, "N", 0))
+                    SeeSatVBmain.TextBox1.AppendText(" Sun angle: " + CStr(SeeSatVBmain.satellites(sndx).view.elsusa) + " Illum: " + _
+                        CStr(CInt(SeeSatVBmain.satellites(sndx).view.illum * 100)) + "% Mag: " + CStr(SeeSatVBmain.satellites(sndx).view.truemag) + _
+                        SeeSatVBmain.satellites(sndx).tle0.magflg + vbNewLine)
+
+                End If
 
             End If
             mouse_xy_click = e.Location
@@ -1066,7 +1144,7 @@ Public Class SatWindow
     ' shows the tooltip if the mouse has been stationary
     Private Sub TimerM_Tick(sender As Object, e As EventArgs) Handles TimerM.Tick
 
-        Show_ToolTip()
+        Show_ToolTipSat()
 
     End Sub
 
@@ -1075,7 +1153,7 @@ Public Class SatWindow
         'Timer1.Interval = 1000
 
         If SatIsDirty = True Or StarIsDirty = True Then
-            Show_ToolTip()
+            Show_ToolTipSat()
             Me.Refresh()
         End If
 

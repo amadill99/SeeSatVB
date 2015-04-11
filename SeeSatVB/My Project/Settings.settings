@@ -53,5 +53,17 @@
     <Setting Name="user_sat_limit" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="user_star_transp" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">0.6</Value>
+    </Setting>
+    <Setting Name="user_star_bright" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">0.9</Value>
+    </Setting>
+    <Setting Name="user_sat_scale" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
+    <Setting Name="user_star_scale" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

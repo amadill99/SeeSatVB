@@ -741,7 +741,11 @@ Public Class AstroGR
             starxy.azm = DefConst.PI + starxy.azm
         End If
 
-        starxy.mag = CType(SatIO.stars(ndx).mag, Double)
+        'starxy.mag = CType(SatIO.stars(ndx).mag, Double)
+        starxy.mag = SatIO.stars(ndx).mag
+
+        starxy.name = SatIO.stars(ndx).name
+        starxy.colors = SatIO.stars(ndx).colors
 
         Return (1)
 
@@ -753,7 +757,7 @@ Public Class AstroGR
     'angles in radians
     Public Shared Function AltAzmtoRaDec(ByVal Alt As Double, ByVal Azm As Double, ByRef Ra As Double, ByRef Dec As Double) As Boolean
 
-        If SatWindow.SHOWSTARS = False Then
+        If SatWindow.ShowStars = False Then
             Return False
         End If
 
@@ -968,14 +972,16 @@ Public Class AstroGR
     '            fracil = fraction of satellite illuminated, [ 0 <= fracil <= 1 ]
     '==================================================================
     ' this module should be private and not called from outside
-    Private Shared Function true_mag(ByVal mgntd As Single) As Double
+    Private Shared Function true_mag(ByVal stdmag As Single) As Double
         ' Must be called after xyztop which sets phase and mgntd for this particular satellite
         ' the calculation for the Molcazan estimate is  mag = stdmag - 15.75 + 2.5 * log10 (range * range / fracil)
         ' so this is the Molcazan formula. If using the McCants values the mag should be adjusted up by a factor of 1.5 to 2
+        ' possible issue - never seems to go negative
 
-        Return (Fix(Math.Abs(mgntd - 15.8 + 2.5 * Math.Log10(Math.Pow(radec.r * DefConst.EARTHR2KM, 2) / illumination())) * 10) / 10)
-        'Return ((Fix(Math.Abs(mgntd - 15.8 + 2.5 * Math.Log10(Math.Pow(dist * DefConst.EARTHR2KM, 2) / illumination(phase))))) * 10) / 10
-
+        'Return (Fix(Math.Abs(stdmag - 15.8 + 2.5 * Math.Log10(Math.Pow(radec.r * DefConst.EARTHR2KM, 2) / illumination())) * 10) / 10)
+        Return (Fix((stdmag - 15.8 + 2.5 * Math.Log10(Math.Pow(radec.r * DefConst.EARTHR2KM, 2) / illumination())) * 10) / 10)
+        'Return Fix(stdmag - 15.8 + 2.5 * Math.Log10((radec.r * DefConst.EARTHR2KM) ^ 2 / illumination()) * 10) / 10
+ 
     End Function
 
     '==================================================================
@@ -1116,6 +1122,8 @@ Public Class star_t
     Public ra As Double
     Public dec As Double
     Public mag As Double
+    Public colors(3) As Integer
+    Public name As String
     Public cosdec As Double
     Public sindec As Double
     Public Function Clone() As star_t
@@ -1127,6 +1135,8 @@ Public Class star_xy
     Public alt As Double        ' elevation
     Public azm As Double        ' azimuth
     Public mag As Double        ' magnitude
+    Public colors(3) As Integer ' windows color - Color.fromArgb()
+    Public name As String       ' name
     Public Function Clone() As star_xy
         Return DirectCast(Me.MemberwiseClone(), star_xy)
     End Function

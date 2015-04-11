@@ -333,6 +333,10 @@ Public Class SeeSatVBmain
         my_params.sat_limit = My.Settings.user_sat_limit
         my_params.sat_mag = My.Settings.user_sat_mag
         FilterByMagToolStripMenuItem.Checked = my_params.sat_limit
+        my_params.sat_scale = My.Settings.user_sat_scale
+        my_params.star_scale = My.Settings.user_star_scale
+        my_params.star_bright = My.Settings.user_star_bright
+        my_params.star_transp = My.Settings.user_star_transp
 
     End Sub
 
@@ -363,6 +367,10 @@ Public Class SeeSatVBmain
         My.Settings.user_center_onzoom = my_params.center_onzoom
         My.Settings.user_sat_limit = my_params.sat_limit
         My.Settings.user_sat_mag = my_params.sat_mag
+        My.Settings.user_sat_scale = my_params.sat_scale
+        My.Settings.user_star_scale = my_params.star_scale
+        My.Settings.user_star_bright = my_params.star_bright
+        My.Settings.user_star_transp = my_params.star_transp
 
         My.Settings.Save()
 
@@ -485,7 +493,7 @@ Public Class SeeSatVBmain
             TimerR.Interval = my_params.sat_time_int
             TimerR.Enabled = True
 
-            If SatWindow.SHOWSTARS Then
+            If SatWindow.ShowStars Then
                 TimerS.Interval = my_params.star_time_int
                 TimerS.Enabled = True
             End If
@@ -585,10 +593,10 @@ Public Class SeeSatVBmain
         ' have to call this once before initstar
         'AstroGR.xyztop(1, JDPUB * DefConst.MINPERDAY, 1)
 
-        If SatWindow.SHOWSTARS Then
+        If SatWindow.ShowStars Then
             AstroGR.initstar()
             If SatWindow.initStarD() = 0 Then
-                SatWindow.SHOWSTARS = False
+                SatWindow.ShowStars = False
             End If
         End If
 
@@ -700,10 +708,10 @@ Public Class SeeSatVBmain
             End If
 
             ' to fix a bug where the stars are out of place until xyztop has been called once
-            If SatWindow.SHOWSTARS And AstroGR.FIRSTIME Then
+            If SatWindow.ShowStars And AstroGR.FIRSTIME Then
                 AstroGR.initstar()
                 If SatWindow.initStarD() = 0 Then
-                    SatWindow.SHOWSTARS = False
+                    SatWindow.ShowStars = False
                 End If
                 AstroGR.FIRSTIME = False
             End If
@@ -1210,7 +1218,7 @@ Public Class SeeSatVBmain
     End Sub
 
     Private Sub NUpDownSec_ValueChanged(sender As Object, e As EventArgs) Handles NUpDownSec.ValueChanged
- 
+
         If NUpDownSec.Value >= 60 Then
             NUpDownSec.Value = 0
             NUpDownMin.Value += 1
@@ -1348,7 +1356,7 @@ Public Class SeeSatVBmain
 
     Private Sub TimerS_Tick(sender As Object, e As EventArgs) Handles TimerS.Tick
 
-        If SatWindow.SHOWSTARS Then
+        If SatWindow.ShowStars Then
             'AstroGR.initstar()
             SatWindow.initStarD()
         End If
@@ -1409,4 +1417,8 @@ Public Class prog_params
     Public ntp_onstart As Boolean   'attempt to get NTP time on startup
     Public sat_mag As Double        'the limting magnitude of the sats to display
     Public sat_limit As Boolean     'use the limiting mag on the sats
+    Public sat_scale As Integer     'scaling factor for satellites - default 10
+    Public star_scale As Integer    'scaling factor for stars - default 10
+    Public star_bright As Single    'brightness adjustment for stars 0 - 1
+    Public star_transp As Single    'transparency adjustment for stars 0 - 1
 End Class

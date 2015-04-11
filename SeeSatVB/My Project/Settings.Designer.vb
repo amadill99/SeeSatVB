@@ -257,6 +257,54 @@ Namespace My
                 Me("user_sat_limit") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0.6")>  _
+        Public Property user_star_transp() As Single
+            Get
+                Return CType(Me("user_star_transp"),Single)
+            End Get
+            Set
+                Me("user_star_transp") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0.9")>  _
+        Public Property user_star_bright() As Single
+            Get
+                Return CType(Me("user_star_bright"),Single)
+            End Get
+            Set
+                Me("user_star_bright") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("10")>  _
+        Public Property user_sat_scale() As Integer
+            Get
+                Return CType(Me("user_sat_scale"),Integer)
+            End Get
+            Set
+                Me("user_sat_scale") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("10")>  _
+        Public Property user_star_scale() As Integer
+            Get
+                Return CType(Me("user_star_scale"),Integer)
+            End Get
+            Set
+                Me("user_star_scale") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

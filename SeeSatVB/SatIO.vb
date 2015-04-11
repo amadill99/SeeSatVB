@@ -9,6 +9,10 @@ Public Class SatIO
 
     Public Shared tle0Dict As New Dictionary(Of Integer, tle0_t)
 
+    ' these are user defined parameters
+    Public Shared CBRIGHT As Single = SeeSatVBmain.my_params.star_bright    'brightness factor
+    Public Shared CTRANSP As Single = SeeSatVBmain.my_params.star_transp    'transparency factor
+
     ' global array for tle0 elements
     Public Shared Tle0Ndx As Integer = 0   ' Last satellite in array sats
 
@@ -39,7 +43,7 @@ Public Class SatIO
                 Try
                     currentRow = MyReader.ReadFields()
 
-                    If currentRow(0) = "RA" Then
+                    If currentRow(0) = "RRA" Then
                         Continue While
                     End If
 
@@ -52,9 +56,11 @@ Public Class SatIO
                     'Next
                     'SeeSatVBmain.TextBox1.AppendText(vbNewLine)
 
-                    myStar.ra = Double.Parse(currentRow(0), CultureInfo.InvariantCulture) * DefConst.DE2RA
-                    myStar.dec = Double.Parse(currentRow(1), CultureInfo.InvariantCulture) * DefConst.DE2RA
+                    myStar.ra = Double.Parse(currentRow(0), CultureInfo.InvariantCulture) '* DefConst.DE2RA
+                    myStar.dec = Double.Parse(currentRow(1), CultureInfo.InvariantCulture) '* DefConst.DE2RA
                     myStar.mag = Double.Parse(currentRow(2), CultureInfo.InvariantCulture)
+                    myStar.name = currentRow(3)
+                    htmlColorToARGB(currentRow(4).Trim, myStar.colors)
                     myStar.cosdec = Math.Cos(myStar.dec)
                     myStar.sindec = Math.Sin(myStar.dec)
 
@@ -81,11 +87,11 @@ Public Class SatIO
 
         If StarNdx > 1 Then
             ReDim Preserve stars(StarNdx - 1)
-            SatWindow.SHOWSTARS = True
+            SatWindow.ShowStars = True
         Else
             ReDim stars(1)
             StarNdx = 0
-            SatWindow.SHOWSTARS = False
+            SatWindow.ShowStars = False
         End If
 
         SeeSatVBmain.TextBox1.AppendText("read " + CStr(StarNdx) + " stars." + vbNewLine)
@@ -93,6 +99,16 @@ Public Class SatIO
         ReadStars = StarNdx
 
     End Function
+
+    Private Shared Sub htmlColorToARGB(ByVal wcolor As String, ByRef colors() As Integer, Optional ByVal mag As Single = 4.0)
+        ' convert and possibly adjust html style color to ARGB values
+        Dim tcolor As Color = ColorTranslator.FromHtml(wcolor)  'scratchpad
+        colors(0) = CInt(tcolor.A * CTRANSP)
+        colors(1) = CInt(tcolor.R * CBRIGHT)
+        colors(2) = CInt(tcolor.G * CBRIGHT)
+        colors(3) = CInt(tcolor.B * CBRIGHT)
+        tcolor = Color.FromArgb(colors(0), colors(0), colors(0), colors(0))
+    End Sub
 
     Shared Function ReadMcname(ByVal fname As String, Optional ByVal clear As Boolean = False) As Integer
         ' read in the Mcnames visual elements and put them in an array
