@@ -60,7 +60,7 @@ Public Class SatIO
                     myStar.dec = Double.Parse(currentRow(1), CultureInfo.InvariantCulture) '* DefConst.DE2RA
                     myStar.mag = Double.Parse(currentRow(2), CultureInfo.InvariantCulture)
                     myStar.name = currentRow(3)
-                    htmlColorToARGB(currentRow(4).Trim, myStar.colors)
+                    htmlColorToARGB(currentRow(4).Trim, myStar.colors, CSng(myStar.mag))
                     myStar.cosdec = Math.Cos(myStar.dec)
                     myStar.sindec = Math.Sin(myStar.dec)
 
@@ -103,10 +103,19 @@ Public Class SatIO
     Private Shared Sub htmlColorToARGB(ByVal wcolor As String, ByRef colors() As Integer, Optional ByVal mag As Single = 4.0)
         ' convert and possibly adjust html style color to ARGB values
         Dim tcolor As Color = ColorTranslator.FromHtml(wcolor)  'scratchpad
-        colors(0) = CInt(tcolor.A * CTRANSP)
-        colors(1) = CInt(tcolor.R * CBRIGHT)
-        colors(2) = CInt(tcolor.G * CBRIGHT)
-        colors(3) = CInt(tcolor.B * CBRIGHT)
+        If mag < 0 Then mag = 0
+        Dim tfactor As Double = 1.5 * Math.Exp(-0.3 * mag)
+        'Dim tfactor As Double = 1
+        Dim bfactor As Double = 1.2 * Math.Exp(-0.2 * mag)
+        'Dim bfactor As Double = 1
+
+        'CTRANSP = 1
+        'CBRIGHT = 1
+
+        colors(0) = CInt(Math.Min(255, tcolor.A * CTRANSP * tfactor))
+        colors(1) = CInt(Math.Min(255, tcolor.R * CBRIGHT * bfactor))
+        colors(2) = CInt(Math.Min(255, tcolor.G * CBRIGHT * bfactor))
+        colors(3) = CInt(Math.Min(255, tcolor.B * CBRIGHT * bfactor))
         tcolor = Color.FromArgb(colors(0), colors(0), colors(0), colors(0))
     End Sub
 

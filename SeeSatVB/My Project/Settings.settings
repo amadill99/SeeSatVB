@@ -12,13 +12,13 @@
       <Value Profile="(Default)">640</Value>
     </Setting>
     <Setting Name="user_rundate" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)">02/13/2015 18:40:00</Value>
+      <Value Profile="(Default)">04/14/2015 09:38:00</Value>
     </Setting>
     <Setting Name="user_tz" Type="System.Double" Scope="User">
       <Value Profile="(Default)">-7</Value>
     </Setting>
     <Setting Name="user_star_path" Type="System.String" Scope="User">
-      <Value Profile="(Default)">E:\Source\Satellite\Data\hipstarcat.csv</Value>
+      <Value Profile="(Default)">E:\Source\Satellite\Data\stardata.csv</Value>
     </Setting>
     <Setting Name="user_mcnames_path" Type="System.String" Scope="User">
       <Value Profile="(Default)">E:\Source\Satellite\Data\mcnames.txt</Value>
@@ -39,7 +39,7 @@
       <Value Profile="(Default)">1000</Value>
     </Setting>
     <Setting Name="user_view_stereo" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="user_ntp_onstart" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -51,10 +51,10 @@
       <Value Profile="(Default)">8</Value>
     </Setting>
     <Setting Name="user_sat_limit" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="user_star_transp" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">0.6</Value>
+      <Value Profile="(Default)">0.9</Value>
     </Setting>
     <Setting Name="user_star_bright" Type="System.Single" Scope="User">
       <Value Profile="(Default)">0.9</Value>

@@ -12,7 +12,6 @@ Public Class SatWindow
     Public Shared MJITTER As Integer = 4        ' the maximum amount the mouse can move just sitting there
 
     ' the projection to use
-    'Public Shared VIEWSTEREO As Boolean = False ' use sterographic projection
     Public Shared VIEWSTEREO As Boolean = SeeSatVBmain.my_params.view_stereo ' use sterographic projection
 
     'Public Shared pbgr As Graphics = SatWindow.CanvasPBox.CreateGraphics
@@ -24,8 +23,7 @@ Public Class SatWindow
     Public Shared CanvasTotal As Rectangle      ' form size
     Public Shared CanvasBounds As RectangleF    ' canvas size
     Public Shared Canvas As Region              ' our drawing canvas
-    'Public Shared screenRectangle As Rectangle  ' Screen.PrimaryScreen.Bounds
-
+    
     Public Shared mouse_xy As Point     ' the current cursor position
     Public Shared mouse_xy_old As Point ' the previous cursor position
     Public Shared mouse_xy_user As Point    ' the user space coordinates of the cursor
@@ -47,11 +45,10 @@ Public Class SatWindow
     Public Shared duskColor As Color = Color.Orange
     Public Shared darkColor As Color = Color.DarkRed
 
-    'Public Shared starColorF As Color = Color.DimGray
-    'Public Shared starColorM As Color = Color.Gray
-    'Public Shared starColorB As Color = Color.LightGray
+    ' unused for now since we included the colour info in the stars data
     Public Shared starColorF As Color = Color.DimGray
     Public Shared starColorM As Color = Color.LightGray
+    'Public Shared starColorM As Color = Color.Gray
     Public Shared starColorB As Color = Color.LightGray
 
     Public Shared LIMITMAG As Double = 8 ' smallest mag to display - change to 8
@@ -164,16 +161,6 @@ Public Class SatWindow
 
     End Sub
 
-    Private Sub setPens()
-        ' set our pen sizes
-        tPen = 1
-        sPen = 2
-        mPen = 3
-        bPen = 4
-
-    End Sub
-
-
     ' set the clipping area
     Private Sub SetClip(ByVal gr As Graphics)
 
@@ -229,15 +216,13 @@ Public Class SatWindow
     Public Shared Sub plotstar(ByVal starxy As star_xy, ByRef starE As structStarD)
 
         ' before these routines are called the routines in AstroVB that establish the observers position have to be called
-        ' topos and xyztop - cleanup!
+        ' topos and xyztop
 
         Dim n As Integer
         Dim e As Integer
         'Dim rval As Integer
         Dim dist As Integer
 
-        'C++ TO VB CONVERTER NOTE: 'extern' variable declarations are not required in VB:
-        '	extern Integer elsusa
         'Dim StarColor As Color
         Dim i As Integer
 
@@ -247,7 +232,6 @@ Public Class SatWindow
         '    'we have rigel
         '    rval = 0
         'End If
-        ''Dim OurGr As Graphics = SatWindow.CreateGraphics
 
         dist = CInt(Fix(WSIZE * Math.Cos(starxy.alt)))
 
@@ -390,7 +374,6 @@ Public Class SatWindow
             b = New SolidBrush(StarsD(ndx).p.Color)
             gr.DrawLine(StarsD(ndx).p, StarsD(ndx).r.Left, StarsD(ndx).r.Bottom, StarsD(ndx).r.Right, StarsD(ndx).r.Top)
             gr.DrawLine(StarsD(ndx).p, StarsD(ndx).r.Left, StarsD(ndx).r.Top, StarsD(ndx).r.Right, StarsD(ndx).r.Bottom)
-            'gr.FillRectangle(b, StarsD(ndx).r)
             gr.FillEllipse(b, StarsD(ndx).r)
         End If
 
@@ -406,32 +389,25 @@ Public Class SatWindow
         Dim e As Integer
         Dim rval As Integer
 
-        'C++ TO VB CONVERTER NOTE: 'extern' variable declarations are not required in VB:
-        '	extern Integer elsusa
         Dim SatColor As Color
         Dim i As Integer
 
         Dim p As Pen
 
-        'Dim OurGr As Graphics = SatWindow.CreateGraphics
         If DEBUG Then
             ' set a conditional breakpoint here
             DEBUG = False
         End If
 
-        ' This is a simple projection that compresses the area below 30 deg
         dist = CInt(Fix(WSIZE * Math.Cos(azel.phi)))
 
         If VIEWSTEREO Then  ' sterographic projection
             n = CInt(WSIZE * Math.Cos(azel.lambda) * Math.Tan((DefConst.PIO2 - azel.phi) / 2))
             e = CInt(-WSIZE * Math.Sin(azel.lambda) * Math.Tan((DefConst.PIO2 - azel.phi) / 2))
-        Else                ' simple projection
+        Else                ' This is a simple projection that compresses the area below 30 deg
             n = CInt(Fix(dist * Math.Cos(azel.lambda)))
             e = CInt(Fix(-dist * Math.Sin(azel.lambda)))
         End If
-
-        'n = CInt(Fix(dist * Math.Cos(azel.lambda)))
-        'e = CInt(Fix(-dist * Math.Sin(azel.lambda)))
 
         ' stereographic projections from http://www2.arnes.si/~gljsentvid10/horizon.html
         'x = COS(z) * TAN((90 - a) / 2)
@@ -443,9 +419,9 @@ Public Class SatWindow
         'the centre of your plot.
 
         Select Case elsusa
-            Case Is < -2
+            Case Is < -1
                 SatColor = darkColor
-            Case -2 To 1
+            Case -1 To 1
                 SatColor = duskColor
             Case Is > 1
                 SatColor = sunColor
@@ -469,8 +445,7 @@ Public Class SatWindow
         SatIsDirty = True
         StarIsDirty = True
         SatWindow.TimerR.Enabled = True
-        'SatWindow.Timer1.Start()
-
+        
     End Sub
 
     ' add a satellite display point to the array
@@ -519,12 +494,13 @@ Public Class SatWindow
 
     ' get the next element in a circular list
     Public Shared Function CListNext(ByVal ndx As Integer, ByVal last As Integer) As Integer
-        ' get the next element in a circular list
+
         ndx = ndx + 1
         If ndx > last Then
             ndx = 1
         End If
         CListNext = ndx
+
     End Function
 
     ' get the next active element in the display list
@@ -631,39 +607,29 @@ Public Class SatWindow
         Dim last As Integer = SatsD(ndx).SatsI.Length() - 1
         Dim b As Brush
         Dim f As Font
-
-        ' Get the bounds of the screen. 
-        'screenRectangle = Screen.PrimaryScreen.Bounds
+        Dim sfactor As Integer = 10
 
         start = SatsD(ndx).ndxI
 
         If SatsD(ndx).SatsI(start).isActive = True Then
-            'b = New SolidBrush(SatsD(ndx).SatsI(start).p.Color)
-            'f = New Font(Me.Font)
-            'gr.DrawEllipse(SatsD(ndx).SatsI(start).p, SatsD(ndx).SatsI(start).r)
-            'If (screenRectangle.Contains(SatsD(ndx).SatsI(start).r)) Then
-            'gr.FillEllipse(b, SatsD(ndx).SatsI(start).r)
-
-            gr.DrawLine(SatsD(ndx).SatsI(start).p, SatsD(ndx).SatsI(start).r.Left, SatsD(ndx).SatsI(start).r.Bottom, _
-                        SatsD(ndx).SatsI(start).r.Right, SatsD(ndx).SatsI(start).r.Top)
-            gr.DrawLine(SatsD(ndx).SatsI(start).p, SatsD(ndx).SatsI(start).r.Left, SatsD(ndx).SatsI(start).r.Top, _
-                        SatsD(ndx).SatsI(start).r.Right, SatsD(ndx).SatsI(start).r.Bottom)
+        
             ' upside down and backwards :-)
-            'gr.DrawString(SatsD(ndx).name, Me.Font, b, SatsD(ndx).SatsI(start).r.Right, SatsD(ndx).SatsI(start).r.Top)
+            gr.DrawLine(SatsD(ndx).SatsI(start).p, SatsD(ndx).SatsI(start).r.Left - sfactor, SatsD(ndx).SatsI(start).r.Bottom + sfactor, _
+                        SatsD(ndx).SatsI(start).r.Right + sfactor, SatsD(ndx).SatsI(start).r.Top - sfactor)
+            gr.DrawLine(SatsD(ndx).SatsI(start).p, SatsD(ndx).SatsI(start).r.Left - sfactor, SatsD(ndx).SatsI(start).r.Top - sfactor, _
+                        SatsD(ndx).SatsI(start).r.Right + sfactor, SatsD(ndx).SatsI(start).r.Bottom + sfactor)
 
-            'End If
             j = CListPrev(start, last)
         Else
             Exit Sub
         End If
 
         While SatsD(ndx).SatsI(j).isActive = True And j <> start
+
             b = New SolidBrush(SatsD(ndx).SatsI(j).p.Color)
-            'gr.DrawEllipse(SatsD(ndx).SatsI(j).p, SatsD(ndx).SatsI(j).r)
-            'If (screenRectangle.Contains(SatsD(ndx).SatsI(j).r)) Then
             gr.FillEllipse(b, SatsD(ndx).SatsI(j).r)
-            'End If
             j = CListPrev(j, last)
+
         End While
 
     End Sub
@@ -692,15 +658,11 @@ Public Class SatWindow
             gr.DrawEllipse(p, New Rectangle(-tsize, -tsize, tsize * 2, tsize * 2))
             tsize = CInt(WSIZE * Math.Tan((DefConst.PIO2 - 60.0 * DefConst.DE2RA) / 2))
             gr.DrawEllipse(p, New Rectangle(-tsize, -tsize, tsize * 2, tsize * 2))
-            'n = CInt(WSIZE * Math.Cos(azel.lambda) * Math.Tan((DefConst.PIO2 - azel.phi) / 2))
-            'e = CInt(-WSIZE * Math.Sin(azel.lambda) * Math.Tan((DefConst.PIO2 - azel.phi) / 2))
         Else                ' simple projection
             tsize = CInt(WSIZE * Math.Cos(30.0 * DefConst.DE2RA))
             gr.DrawEllipse(p, New Rectangle(-tsize, -tsize, tsize * 2, tsize * 2))
             tsize = CInt(WSIZE * Math.Cos(60.0 * DefConst.DE2RA))
             gr.DrawEllipse(p, New Rectangle(-tsize, -tsize, tsize * 2, tsize * 2))
-            'n = CInt(Fix(dist * Math.Cos(azel.lambda)))
-            'e = CInt(Fix(-dist * Math.Sin(azel.lambda)))
         End If
 
 
@@ -736,10 +698,8 @@ Public Class SatWindow
         mx.Translate(base * 4 * Math.Sign(grMatrix.Elements(0)), base * 4 * Math.Sign(grMatrix.Elements(3)))
         gg.Transform = mx
 
-        'gg.Clear(formColor)
-
         gg.DrawString(text, f, b, -20, -20)
-        
+
         gr.DrawImage(bmap, X + base * 2 * Math.Sign(grMatrix.Elements(0)), Y + base * 2 * Math.Sign(grMatrix.Elements(3)))
 
         gg.Dispose()
@@ -752,46 +712,6 @@ Public Class SatWindow
         Dim p As Pen = New Pen(gColor, mPen)
         'gr.DrawLine(p, CInt(WSIZE * Math.Sin(angle)), CInt(-WSIZE * Math.Cos(angle)), CInt(-WSIZE * Math.Sin(angle)), CInt(WSIZE * Math.Cos(angle)))
         gr.DrawLine(p, 0, 0, CInt(-WSIZE * Math.Sin(angle)), CInt(WSIZE * Math.Cos(angle)))
-
-    End Sub
-
-
-    Sub testTrans(ByVal gr As Graphics)
-
-        ' Draw coordinate axes.
-        ' make a pen for the axes. 
-        ' (Width 0 means a fine line.)
-        Dim red_pen As Pen = New Pen(Color.Red, sPen)
-        Dim stepsz As Integer = CInt(WSIZE / 10)
-
-        gr.DrawLine(red_pen, -WSIZE, 0, WSIZE, 0)
-        For x As Integer = stepsz To stepsz * 10 Step stepsz
-            gr.DrawLine(red_pen, x, -3, x, 3)
-        Next x
-        gr.DrawLine(red_pen, 0, -WSIZE, 0, WSIZE)
-        For y As Integer = stepsz To stepsz * 100 Step stepsz
-            gr.DrawLine(red_pen, -3, y, 3, y)
-        Next y
-
-    End Sub
-
-    Private Sub TestWindow(ByVal gr As Graphics)
-        Dim p1, p2, p3 As Pen
-        Dim d As Integer
-        Dim x As Integer
-
-        d = Math.Min(Me.ClientRectangle.Width, Me.ClientRectangle.Height)
-        x = CInt(Me.ClientRectangle.Width / 2 - d / 2)
-
-        p1 = New Pen(Brushes.Navy, sPen)
-        p2 = New Pen(Brushes.Navy, mPen)
-        p3 = New Pen(Brushes.Navy, bPen)
-
-        gr.DrawEllipse(p1, New Rectangle(-WSIZE, -WSIZE, WSIZE * 2, WSIZE * 2))
-
-        gr.DrawLine(p3, 0, 0, 1000, 1000)
-        gr.DrawLine(p2, 1000, 0, 1000, 1000)
-
 
     End Sub
 
@@ -961,14 +881,25 @@ Public Class SatWindow
 
                 FindNearestStar(mouse_xy_user, sndx, distance)
                 If distance < mindist Then
+                    ' This doesn't work given the conversions from double to int when putting dots on the screen
+                    'Dim Alt, Azm As Double
+                    'Dim Ra, Dec As Double
+                    'MouseXYtoAltAzm(New System.Drawing.Point(CInt(StarsD(sndx).r.Right + (StarsD(sndx).r.Right - StarsD(sndx).r.Left) / 2), _
+                    '            CInt(StarsD(sndx).r.Top + (StarsD(sndx).r.Top - StarsD(sndx).r.Bottom) / 2)), Alt, Azm)
+                    'AstroGR.AltAzmtoRaDec(Alt, Azm, Ra, Dec)
+                    'ToolStripSLMouseXY.Text = "Alt: " + CStr(Math.Round(Alt * DefConst.RA2DE, 4)) + " Azm: " + CStr(Math.Round(Azm * DefConst.RA2DE, 4))
                     If Len(StarsD(sndx).sname) > 1 Then
                         ToolTipSat.Show(StarsD(sndx).sname + vbNewLine + "Mag " + CStr(StarsD(sndx).mag), _
                             Me, mouse_xy.X + 20, mouse_xy.Y + 20, 10000)
+                        'TextBoxS.AppendText(vbNewLine + "Star name: " + StarsD(sndx).sname + " Mag: " + CStr(StarsD(sndx).mag) + _
+                        '    " RA: " + Parser.DecDegToHrString(Ra * DefConst.RA2DE, "", 0) + " Dec: " + Parser.DecDegToDMSString(Dec * DefConst.RA2DE, "N", 0) + vbNewLine)
+                        TextBoxS.AppendText(vbNewLine + "Star - Name: " + StarsD(sndx).sname + " - Mag: " + CStr(StarsD(sndx).mag) + vbNewLine)
                     Else
                         ToolTipSat.Show("Mag " + CStr(StarsD(sndx).mag), _
                                 Me, mouse_xy.X + 20, mouse_xy.Y + 20, 10000)
+                        TextBoxS.AppendText(vbNewLine + "Star - Mag: " + CStr(StarsD(sndx).mag) + vbNewLine)
                     End If
-                    
+
                 End If
 
             Else
@@ -1048,11 +979,6 @@ Public Class SatWindow
     '    StarIsDirty = True
     'End Sub
 
-    Private Sub SatWindow_MouseHover(sender As Object, e As EventArgs) Handles MyBase.MouseHover
-        'ToolTipSat.Active = True
-        'ToolTipSat.Show("Test", Me)
-    End Sub
-
     Private Sub SatWindow_MouseWheel(sender As Object, e As MouseEventArgs) Handles MyBase.MouseWheel
 
         If e.Y < CanvasBounds.Top Or e.Y > CanvasBounds.Bottom Or e.X < CanvasBounds.Left Or e.X > CanvasBounds.Right Then
@@ -1093,9 +1019,6 @@ Public Class SatWindow
     End Sub
 
     Private Sub SatWindow_MouseMove(sender As Object, e As MouseEventArgs) Handles MyBase.MouseMove
-        'ToolTipSat.Active = False
-        'ToolTipSat.Hide(Me)
-        'If (Math.Abs(e.X - mouse_xy.X) > 10 Or Math.Abs(e.Y - mouse_xy.Y) > 10) And Not grMatrix Is Nothing Then ' the mouse has moved more than jitter
 
         'If (Math.Abs(e.X - mouse_xy.X) > MJITTER Or Math.Abs(e.Y - mouse_xy.Y) > MJITTER) Then ' the mouse has moved more than jitter
         If Math.Sqrt((e.X - mouse_xy.X) ^ 2 + (e.Y - mouse_xy.Y) ^ 2) > MJITTER Then ' the mouse has moved more than jitter
@@ -1119,7 +1042,7 @@ Public Class SatWindow
             'ToolStripSLMouseXY.Text = "Alt " + Parser.DecDegToDMSString(Alt * DefConst.RA2DE, "", 0) + " Azm " + Parser.DecDegToDMSString(Azm * DefConst.RA2DE, "", 0)
             ToolStripSLMouseXY.Text = "Alt: " + CStr(Math.Round(Alt * DefConst.RA2DE, 4)) + " Azm: " + CStr(Math.Round(Azm * DefConst.RA2DE, 4))
             Dim Ra, Dec As Double
-            If AstroGR.AltAzmtoRaDec(Alt, Azm, Ra, Dec) AndAlso Alt <> 0 Then
+            If Alt <> 0 AndAlso AstroGR.AltAzmtoRaDec(Alt, Azm, Ra, Dec) Then
                 ToolStripSLMouseXY.Text = ToolStripSLMouseXY.Text + " RA: " + Parser.DecDegToHrString(Ra * DefConst.RA2DE, "", 0) + _
                     " Dec: " + Parser.DecDegToDMSString(Dec * DefConst.RA2DE, "N", 0)
             End If
@@ -1150,7 +1073,6 @@ Public Class SatWindow
 
     ' refreshes the screen
     Private Sub TimerR_Tick(sender As Object, e As EventArgs) Handles TimerR.Tick
-        'Timer1.Interval = 1000
 
         If SatIsDirty = True Or StarIsDirty = True Then
             Show_ToolTipSat()

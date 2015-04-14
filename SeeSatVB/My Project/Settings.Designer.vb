@@ -92,7 +92,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("02/13/2015 18:40:00")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("04/14/2015 09:38:00")>  _
         Public Property user_rundate() As Date
             Get
                 Return CType(Me("user_rundate"),Date)
@@ -116,7 +116,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("E:\Source\Satellite\Data\hipstarcat.csv")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("E:\Source\Satellite\Data\stardata.csv")>  _
         Public Property user_star_path() As String
             Get
                 Return CType(Me("user_star_path"),String)
@@ -200,7 +200,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
         Public Property user_view_stereo() As Boolean
             Get
                 Return CType(Me("user_view_stereo"),Boolean)
@@ -248,7 +248,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
         Public Property user_sat_limit() As Boolean
             Get
                 Return CType(Me("user_sat_limit"),Boolean)
@@ -260,7 +260,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("0.6")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0.9")>  _
         Public Property user_star_transp() As Single
             Get
                 Return CType(Me("user_star_transp"),Single)
