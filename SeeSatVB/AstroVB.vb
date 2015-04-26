@@ -423,6 +423,7 @@ Public Class AstroGR
         Return (CInt(Fix(elev)))
     End Function
 
+ 
     '==================================================================
     '	 (ep)
     '	double ep;          epoch
@@ -523,64 +524,65 @@ Public Class AstroGR
     End Function
 
     '==================================================================
+    ' REPLACED by the class method
     '	 (ep)
     '	double ep;
     '	Sets up struct "dircos" (direction cosines) in module ASTRO to precess
     '	satellite R.A/dec.  Initial epoch will be "ep" and final epoch is
     '	determined by REFEP in ASTRO. 
     '==================================================================
-    Public Shared Sub inpre(ByVal epoch As Double)
-        ' Set up struct "dircos" to precess from initial epoch "epoch" to final epoch
-        '"REFEP".  Used in conjunction with preces().  Formulae are the "rigorous
-        'method" given by Meeus, which he in turn attributes to Newcomb.
-        ' epoch is satellite epoch in julian days expressed in minutes
-        ' SGP4class uses epoch julian days expressed in days
+    'Public Shared Sub inpre(ByVal epoch As Double)
+    '    ' Set up class "dircos" to precess from initial epoch "epoch" to final epoch
+    '    '"REFEP".  Used in conjunction with preces().  Formulae are the "rigorous
+    '    'method" given by Meeus, which he in turn attributes to Newcomb.
+    '    ' epoch is satellite epoch in julian days expressed in minutes
+    '    ' SGP4class uses epoch julian days expressed in days
 
-        Dim temp As Double
-        Dim sinzet As Double
-        Dim coszet As Double
-        Dim sinz As Double
-        Dim cosz As Double
-        Dim sinthe As Double
-        Dim costhe As Double
-        Dim tau0 As Double
-        Dim tau As Double
+    '    Dim temp As Double
+    '    Dim sinzet As Double
+    '    Dim coszet As Double
+    '    Dim sinz As Double
+    '    Dim cosz As Double
+    '    Dim sinthe As Double
+    '    Dim costhe As Double
+    '    Dim tau0 As Double
+    '    Dim tau As Double
 
-        Static trocen As Double = 52594876.7 ' min. per trop. century
+    '    Static trocen As Double = 52594876.7 ' min. per trop. century
 
-        tau0 = (epoch - 3477629251.0) / trocen
-        'C++ TO VB CONVERTER WARNING: C++ to VB Converter cannot determine whether both operands of this division are integer types
-        ' - if they are then you should use the VB integer division operator:
-        tau = (DefConst.REFEP - epoch) / trocen
+    '    tau0 = (epoch - 3477629251.0) / trocen
+    '    'C++ TO VB CONVERTER WARNING: C++ to VB Converter cannot determine whether both operands of this division are integer types
+    '    ' - if they are then you should use the VB integer division operator:
+    '    tau = (DefConst.REFEP - epoch) / trocen
 
-        temp = tau * ((0.011171319 + 0.000006768 * tau0) + tau * (0.000001464 + tau * 0.000000087))
-        sinzet = Math.Sin(temp)
-        coszet = Math.Cos(temp)
+    '    temp = tau * ((0.011171319 + 0.000006768 * tau0) + tau * (0.000001464 + tau * 0.000000087))
+    '    sinzet = Math.Sin(temp)
+    '    coszet = Math.Cos(temp)
 
-        temp = temp + tau * tau * (0.000003835 + 0.000000005 * tau)
-        sinz = Math.Sin(temp)
-        cosz = Math.Cos(temp)
+    '    temp = temp + tau * tau * (0.000003835 + 0.000000005 * tau)
+    '    sinz = Math.Sin(temp)
+    '    cosz = Math.Cos(temp)
 
-        '	  temp = tau * ((9.7189726e-3 - 4.135e-6 * tau0) + tau * (-2.065e-6 2.04e-7 * tau))
-        '	  -2.065e-6 -= 1
+    '    '	  temp = tau * ((9.7189726e-3 - 4.135e-6 * tau0) + tau * (-2.065e-6 2.04e-7 * tau))
+    '    '	  -2.065e-6 -= 1
 
-        temp = tau * ((0.0097189726 - 0.000004135 * tau0) + tau * (-0.000002065 - -0.000000204 * tau))
+    '    temp = tau * ((0.0097189726 - 0.000004135 * tau0) + tau * (-0.000002065 - -0.000000204 * tau))
 
-        sinthe = Math.Sin(temp)
-        costhe = Math.Cos(temp)
+    '    sinthe = Math.Sin(temp)
+    '    costhe = Math.Cos(temp)
 
-        dircos.xx = coszet * cosz * costhe - sinzet * sinz
-        dircos.xy = sinzet * cosz + coszet * sinz * costhe
-        dircos.xz = coszet * sinthe
-        dircos.yx = -coszet * sinz - sinzet * cosz * costhe
-        dircos.yy = coszet * cosz - sinzet * sinz * costhe
-        dircos.yz = -sinzet * sinthe
-        dircos.zx = -cosz * sinthe
-        dircos.zy = -sinz * sinthe
-        dircos.zz = costhe
-    End Sub
+    '    dircos.xx = coszet * cosz * costhe - sinzet * sinz
+    '    dircos.xy = sinzet * cosz + coszet * sinz * costhe
+    '    dircos.xz = coszet * sinthe
+    '    dircos.yx = -coszet * sinz - sinzet * cosz * costhe
+    '    dircos.yy = coszet * cosz - sinzet * sinz * costhe
+    '    dircos.yz = -sinzet * sinthe
+    '    dircos.zx = -cosz * sinthe
+    '    dircos.zy = -sinz * sinthe
+    '    dircos.zz = costhe
+    'End Sub
 
-    '==================================================================
+    ''==================================================================
     '	 (x)
     '	double x;
     '	Returns x, such that 0 <= x < 2pi, i.e., takes out multiples of 2pi. 
@@ -696,9 +698,12 @@ Public Class AstroGR
         'extern double localhra;   /* local hour angle of aries from xyztop() */
         '	extern double DEC2RA, localra, PI, twopi;
 
-        'Dim starxy As New star_xy
-
         ' MUST CALL XYZTOP FIRST for llhaa
+
+        If SeeSatVBmain.obs Is Nothing Then
+            'MessageBox.Show("Tilt - obs struct not initialized - call topos")
+            Return 0
+        End If
 
         Dim dhra As Double ' temporary terms
         Dim cosdhra As Double
@@ -718,7 +723,7 @@ Public Class AstroGR
         If decmax > 0.0 AndAlso SatIO.stars(ndx).dec > CSng(decmax) Then
             Return (0) ' star below northern horizon
         End If
-
+        ' ------ TODO re-work this to use RaDecToAltAzm function -------
         dhra = localhra - SatIO.stars(ndx).ra
         cosdhra = Math.Cos(dhra)
 
@@ -748,6 +753,58 @@ Public Class AstroGR
         starxy.colors = SatIO.stars(ndx).colors
 
         Return (1)
+
+    End Function
+
+    '==================================================================
+    '	 (ep)
+    '	double ep;      epoch
+    '	Returns star_xy of sun (in radians) at observer. 
+    '==================================================================
+
+    Public Shared Function calc_sun(ByVal ep As Double, ByRef sunxy As star_xy) As Integer
+        Dim lst As Double ' local sidereal time
+        'Dim alt, azm As Double ' elevation and azimuth of sun, radians
+        Dim csun As New xyz_t() ' coordinates of sun
+
+        lst = AstroGR.thetag(ep) + SeeSatVBmain.obs.lambda
+        AstroGR.sun(csun, ep) ' get sun's position
+
+        ' point the positive z-axis at zenith
+        AstroGR.zrot(csun, Math.Sin(lst), Math.Cos(lst))
+        AstroGR.yrot(csun, SeeSatVBmain.obs.coslat, SeeSatVBmain.obs.sinlat)
+
+        sunxy.alt = Math.Asin(csun.z) '* DefConst.RA2DE
+
+        'If sunxy.alt < 0 Then 'it is below the horizon
+        '    Return 0
+        'End If
+
+        '     If desired, the sun's azimuth (deg) can be found here with the
+        '    expression fmod2p(atan2(csun.y, -csun.x)) * RA2DE
+        sunxy.azm = fmod2p(Math.Atan2(csun.y, -csun.x)) '* DefConst.RA2DE
+
+        ' #fff5f2 - suns colour
+        ' -26.7 - suns mag
+        sunxy.mag = -26.7
+
+        Select Case sunxy.alt * DefConst.DE2RA
+            Case Is < -18
+            Case -12 To -18
+                SatIO.htmlColorToARGB("#430303", sunxy.colors, 6)
+            Case -6 To -12
+                SatIO.htmlColorToARGB("#550909", sunxy.colors, 5)
+            Case -6 To 0
+                SatIO.htmlColorToARGB("#711212", sunxy.colors, 3)
+            Case 0 To 1
+                SatIO.htmlColorToARGB("#c65825", sunxy.colors, 0)
+            Case Else
+                SatIO.htmlColorToARGB("#fff5f2", sunxy.colors, CSng(sunxy.mag))
+        End Select
+
+        sunxy.name = "Sol"
+
+        Return 1
 
     End Function
 
@@ -792,6 +849,64 @@ Public Class AstroGR
         ' {RA, Dec}]   
     End Function
 
+    '  translate ra, dec to alt, azm at observers time and location
+    ' built from the calcstar function
+    Public Shared Function RaDecToAltAzm(ByVal ra As Double, ByVal dec As Double, ByRef alt As Double, ByRef azm As Double) As Boolean
+
+        'extern struct OBS obs;
+        'extern double decmax;      /* from initstar */
+        'extern double localhra;   /* local hour angle of aries from xyztop() */
+        '	extern double DEC2RA, localra, PI, twopi;
+
+        ' MUST CALL XYZTOP FIRST for llhaa
+
+        If SeeSatVBmain.obs Is Nothing Then
+            MessageBox.Show("Tilt - obs struct not initialized - call topos")
+            Return False
+        End If
+
+        Dim dhra As Double ' temporary terms
+        Dim cosdhra As Double
+        Dim cosz As Double
+        Dim sinzsinA As Double
+        Dim sinzcosA As Double
+
+        If decmax < 0.0 AndAlso dec < CSng(decmax) Then
+            Return False ' point below southern horizon
+        End If
+
+        If decmax > 0.0 AndAlso dec > CSng(decmax) Then
+            Return False ' point below northern horizon
+        End If
+
+        dhra = localhra - ra
+        cosdhra = Math.Cos(dhra)
+
+        'cosz = (CType(SatIO.stars(ndx).sindec, Double) * SeeSatVBmain.obs.sinlat) + _
+        '    (CType(SatIO.stars(ndx).cosdec, Double) * SeeSatVBmain.obs.coslat * cosdhra)
+        cosz = Math.Sin(dec) * SeeSatVBmain.obs.sinlat + Math.Cos(dec) * SeeSatVBmain.obs.coslat * cosdhra
+
+        alt = DefConst.PIO2 - Math.Acos(cosz)
+        If alt < 0.0 Then ' is below the horizon
+            Return False
+        End If
+
+        'sinzcosA = (CType(SatIO.stars(ndx).sindec, Double) * SeeSatVBmain.obs.coslat - _
+        '            CType(SatIO.stars(ndx).cosdec, Double) * cosdhra * SeeSatVBmain.obs.sinlat)
+
+        'sinzsinA = -CType(SatIO.stars(ndx).cosdec, Double) * Math.Sin(dhra)
+        sinzcosA = Math.Sin(dec) * SeeSatVBmain.obs.coslat - Math.Cos(dec) * cosdhra * SeeSatVBmain.obs.sinlat
+
+        sinzsinA = -Math.Cos(dec) * Math.Sin(dhra)
+
+        azm = Math.Atan(sinzsinA / sinzcosA)
+        If sinzcosA < 0.0 Then
+            azm = DefConst.PI + azm
+        End If
+
+        Return True
+
+    End Function
 
     '==================================================================
     ' Put the mean equatorial xyz components of a unit vector to sun at
@@ -928,7 +1043,7 @@ Public Class AstroGR
     'Function sunlon() As Double ' true longitude of sun
     'C++ TO VB CONVERTER TODO TASK: The implementation of the following method could not be found:
     'Sub sun() ' xyz of sun (interpol.)
-    Public Shared dircos As New AnonymousClass()
+    Public Shared dircos As New dircos_t()
 
     Public Shared localhra As Double
     Public Shared phase As Double
@@ -981,7 +1096,7 @@ Public Class AstroGR
         'Return (Fix(Math.Abs(stdmag - 15.8 + 2.5 * Math.Log10(Math.Pow(radec.r * DefConst.EARTHR2KM, 2) / illumination())) * 10) / 10)
         Return (Fix((stdmag - 15.8 + 2.5 * Math.Log10(Math.Pow(radec.r * DefConst.EARTHR2KM, 2) / illumination())) * 10) / 10)
         'Return Fix(stdmag - 15.8 + 2.5 * Math.Log10((radec.r * DefConst.EARTHR2KM) ^ 2 / illumination()) * 10) / 10
- 
+
     End Function
 
     '==================================================================
@@ -1149,9 +1264,78 @@ Public Class xyz_t
     Public x As Double
     Public y As Double
     Public z As Double
+
     Public Function Clone() As xyz_t
         Return DirectCast(Me.MemberwiseClone(), xyz_t)
     End Function
+
+    Public Sub add(b As xyz_t)
+        Me.x += b.x
+        Me.y += b.y
+        Me.z += b.z
+    End Sub
+
+    ' these are the same as the AstroGR class routines - TODO - change the routines in AstroVB to use these.
+    Public Sub zrot(ByVal sint As Double, ByVal cost As Double)
+        ' Z-rotates coordinate axes for "cor" by angle t, where "sint"
+        'and "cost" are the sine and cosine of t.
+        Dim tempx, tempy As Double
+        tempx = Me.x * cost + Me.y * sint
+        tempy = Me.y * cost - Me.x * sint
+        Me.x = tempx
+        Me.y = tempy
+    End Sub
+
+    '==================================================================
+    ' similar to zrot(), except rotate about y axis
+    '==================================================================
+    Public Sub yrot(ByVal sint As Double, ByVal cost As Double)
+        Dim tempx, tempz As Double
+        tempz = Me.z * cost + Me.x * sint
+        tempx = Me.x * cost - Me.z * sint
+        Me.x = tempx
+        Me.z = tempz
+    End Sub
+
+
+    '==================================================================
+    ' similar to zrot(), except rotate about x axis - here for completeness
+    '==================================================================
+    Public Sub xrot(ByVal sint As Double, ByVal cost As Double)
+        Dim tempy, tempz As Double
+        tempy = Me.y * cost + Me.z * sint
+        tempz = Me.y * cost - Me.z * sint
+        Me.y = tempy
+        Me.z = tempz
+    End Sub
+
+    Public Sub unit_vector()
+        ' make xyz_t into a unit vector
+        Dim rho As Double
+        rho = Math.Sqrt(Me.x * Me.x + Me.y * Me.y + Me.z * Me.z)
+        Me.x = Me.x / rho
+        Me.y = Me.y / rho
+        Me.z = Me.z / rho
+    End Sub
+
+    '==================================================================
+    ' Uses direction cosines "dircos" (external class) to rotate axes of
+    'struct "cor".
+    ' changed to by ref ATM
+    '==================================================================
+    Public Sub preces(ByVal dircos As dircos_t)
+        ' the dircos class must be initialized to a particular epoch by calling the init_precess first
+        Dim tempx As Double
+        Dim tempy As Double
+        Dim tempz As Double
+        tempx = Me.x * dircos.xx + Me.y * dircos.yx + Me.z * dircos.zx
+        tempy = Me.x * dircos.xy + Me.y * dircos.yy + Me.z * dircos.zy
+        tempz = Me.x * dircos.xz + Me.y * dircos.yz + Me.z * dircos.zz
+        Me.x = tempx
+        Me.y = tempy
+        Me.z = tempz
+    End Sub
+
 End Class
 
 'defined in the main program
@@ -1171,22 +1355,23 @@ End Class
 'principal plane (e.g., longitude). 
 
 Public Class sph_t
-    Public r As Double      'radius
-    Public phi As Double    'angle (lat)
-    Public lambda As Double 'angle (lon)
+    Public r As Double      'radius (range,hgt)
+    Public phi As Double    'angle (lat,azm,ra)
+    Public lambda As Double 'angle (lon,elv/alt,dec)
     Public Function Clone() As sph_t
         Return DirectCast(Me.MemberwiseClone(), sph_t)
     End Function
 End Class ' 1st call ' 2nd call
+
+' 1st call ' 2nd call
+
 
 '########################### LOCAL DATA ###########################
 
 ' direction cosines, i.e., a rotation matrix.  Initialized by inpre() & used
 'by preces() to correct satellite Right Ascension & declination for precession
 'of earth's polar axis 
-'C++ TO VB CONVERTER NOTE: Classes must be named in VB, so the following class has been named AnonymousClass:
-'Public Class AnonymousClass
-Public Class AnonymousClass
+Public Class dircos_t
     Public xx As Double
     Public xy As Double
     Public xz As Double
@@ -1196,5 +1381,57 @@ Public Class AnonymousClass
     Public zx As Double
     Public zy As Double
     Public zz As Double
+
+    Public Sub init_precess(ByVal epoch As Double)
+        ' Set up class "dircos" to precess from initial epoch "epoch" to final epoch
+        '"REFEP".  Used in conjunction with preces().  Formulae are the "rigorous
+        'method" given by Meeus, which he in turn attributes to Newcomb.
+        ' epoch is satellite epoch in julian days expressed in minutes
+        ' SGP4class uses epoch julian days expressed in days
+
+        Dim temp As Double
+        Dim sinzet As Double
+        Dim coszet As Double
+        Dim sinz As Double
+        Dim cosz As Double
+        Dim sinthe As Double
+        Dim costhe As Double
+        Dim tau0 As Double
+        Dim tau As Double
+
+        Static trocen As Double = 52594876.7 ' min. per trop. century
+
+        tau0 = (epoch - 3477629251.0) / trocen
+        'C++ TO VB CONVERTER WARNING: C++ to VB Converter cannot determine whether both operands of this division are integer types
+        ' - if they are then you should use the VB integer division operator:
+        tau = (DefConst.REFEP - epoch) / trocen
+
+        temp = tau * ((0.011171319 + 0.000006768 * tau0) + tau * (0.000001464 + tau * 0.000000087))
+        sinzet = Math.Sin(temp)
+        coszet = Math.Cos(temp)
+
+        temp = temp + tau * tau * (0.000003835 + 0.000000005 * tau)
+        sinz = Math.Sin(temp)
+        cosz = Math.Cos(temp)
+
+        '	  temp = tau * ((9.7189726e-3 - 4.135e-6 * tau0) + tau * (-2.065e-6 2.04e-7 * tau))
+        '	  -2.065e-6 -= 1
+
+        temp = tau * ((0.0097189726 - 0.000004135 * tau0) + tau * (-0.000002065 - -0.000000204 * tau))
+
+        sinthe = Math.Sin(temp)
+        costhe = Math.Cos(temp)
+
+        Me.xx = coszet * cosz * costhe - sinzet * sinz
+        Me.xy = sinzet * cosz + coszet * sinz * costhe
+        Me.xz = coszet * sinthe
+        Me.yx = -coszet * sinz - sinzet * cosz * costhe
+        Me.yy = coszet * cosz - sinzet * sinz * costhe
+        Me.yz = -sinzet * sinthe
+        Me.zx = -cosz * sinthe
+        Me.zy = -sinz * sinthe
+        Me.zz = costhe
+    End Sub
+
 End Class
 

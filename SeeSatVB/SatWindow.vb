@@ -9,6 +9,9 @@ Public Class SatWindow
     Public Shared WBORDER As Double = 0.05      ' the percentage of width of the border around the graphics area that we clip off
     Public Shared WSCALE As Double = 1          ' the global scale factor
     Public Shared WMAXSCALE As Double = 16      ' maximum scale factor
+    ' TODO - find every x,y screen calculation and fix the reversed X axis
+    Public Shared WXFLIP As Integer = -1        ' flip the x axis -1 positive to the left, +1 positive to the right
+    Public Shared WYFLIP As Integer = 1         ' flip the y axis -1 positive to the bottom, +1 positive to the top
     Public Shared MJITTER As Integer = 4        ' the maximum amount the mouse can move just sitting there
 
     ' the projection to use
@@ -98,6 +101,8 @@ Public Class SatWindow
 
     Public Shared StarsD() As structStarD
 
+    Public Shared fov As New FOV    ' field of view
+
     Private Sub SatWindow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
     End Sub
@@ -115,6 +120,10 @@ Public Class SatWindow
         DrawGrid(e.Graphics)
 
         TextBoxS.Width = CInt(CanvasTotal.Width - (CanvasBounds.Left + CanvasBounds.Right))
+
+        If FirstTime Then
+            fov.initialize()
+        End If
 
         If ShowStars = True And StarIsDirty = True And FirstTime = False Then
             DrawAllStars(e.Graphics)
@@ -146,9 +155,13 @@ Public Class SatWindow
         ' set the clipping area to the window minumum less WBORDER %
         SetClip(gr)
 
-        ' set the coordinate system to origin 0,0 in the middle and +y to the top
-        SetScale(gr, CInt(CanvasBounds.Width), CInt(CanvasBounds.Height), CInt((WSIZE) / WSCALE), _
-                 CInt((-WSIZE) / WSCALE), CInt((WSIZE) / WSCALE), CInt((-WSIZE) / WSCALE))
+        ' set the coordinate system to origin 0,0 in the middle and +y to the top (+x to the left the way it is now)
+        SetScale(gr, CInt(CanvasBounds.Width), CInt(CanvasBounds.Height), CInt((WXFLIP * -WSIZE) / WSCALE), _
+                 CInt((WXFLIP * WSIZE) / WSCALE), CInt((WYFLIP * WSIZE) / WSCALE), CInt((WYFLIP * -WSIZE) / WSCALE))
+
+        ' this would set things up with +x to the right - text routines stop working if you do
+        'SetScale(gr, CInt(CanvasBounds.Width), CInt(CanvasBounds.Height), CInt((-WSIZE) / WSCALE), _
+        '         CInt((WSIZE) / WSCALE), CInt((WSIZE) / WSCALE), CInt((-WSIZE) / WSCALE))
 
         'Me.Size = New Size(CInt(Me.Size.Width / WSCALE), CInt(Me.Size.Height / WSCALE))
         grMatrix = gr.Transform
@@ -158,6 +171,9 @@ Public Class SatWindow
 
         'clear the clipping region
         gr.ResetClip()
+
+        ' initialize the fov
+        'FOV.init()
 
     End Sub
 
@@ -236,11 +252,11 @@ Public Class SatWindow
         dist = CInt(Fix(WSIZE * Math.Cos(starxy.alt)))
 
         If VIEWSTEREO Then  ' sterographic projection
-            n = CInt(WSIZE * Math.Cos(starxy.azm) * Math.Tan((DefConst.PIO2 - starxy.alt) / 2))
-            e = CInt(-WSIZE * Math.Sin(starxy.azm) * Math.Tan((DefConst.PIO2 - starxy.alt) / 2))
+            n = CInt(WYFLIP * WSIZE * Math.Cos(starxy.azm) * Math.Tan((DefConst.PIO2 - starxy.alt) / 2))
+            e = CInt(WXFLIP * WSIZE * Math.Sin(starxy.azm) * Math.Tan((DefConst.PIO2 - starxy.alt) / 2))
         Else                ' simple projection
-            n = CInt(Fix(dist * Math.Cos(starxy.azm)))
-            e = CInt(Fix(-dist * Math.Sin(starxy.azm)))
+            n = CInt(Fix(WYFLIP * dist * Math.Cos(starxy.azm)))
+            e = CInt(Fix(WXFLIP * dist * Math.Sin(starxy.azm)))
         End If
 
         ' stereographic projections from http://www2.arnes.si/~gljsentvid10/horizon.html
@@ -275,6 +291,9 @@ Public Class SatWindow
         p.Color = Color.FromArgb(starxy.colors(0), starxy.colors(1), starxy.colors(2), starxy.colors(3))
         'p.Color.A = 128
 
+        ' test comment out
+        p.Width = tPen
+
         Select Case starxy.mag
             Case Is > 8.0
                 i = StarSize
@@ -305,8 +324,17 @@ Public Class SatWindow
 
         ReDim StarsD(sz)     ' destroy the existing array and create anew
         ndx = 1
+        Dim sunxy As New star_xy
+        rval = AstroGR.calc_sun(SeeSatVBmain.JDPUB * DefConst.MINPERDAY, sunxy)
+        If rval = 1 Then
+            Dim sunE As New structStarD
+            plotstar(sunxy, sunE)
+            sunE.sname = sunxy.name
+            StarsD(ndx) = sunE
+            ndx += 1
+        End If
 
-        For i = 1 To sz
+        For i = ndx To sz
             If SatIO.stars(i).mag < LIMITMAG Then
                 Dim starxy As New star_xy
                 rval = AstroGR.calcstar(i, starxy)   ' 1 if visible
@@ -353,6 +381,11 @@ Public Class SatWindow
                 DrawOneStar(ndx, gr)
             End If
         Next
+
+        If fov.show = True Then
+            fov.draw(gr)
+        End If
+
         StarIsDirty = False
         TimerR.Enabled = True
 
@@ -372,6 +405,7 @@ Public Class SatWindow
 
         If StarsD(ndx).mag < lmag Then
             b = New SolidBrush(StarsD(ndx).p.Color)
+            ' adds a cross effect to the stars
             gr.DrawLine(StarsD(ndx).p, StarsD(ndx).r.Left, StarsD(ndx).r.Bottom, StarsD(ndx).r.Right, StarsD(ndx).r.Top)
             gr.DrawLine(StarsD(ndx).p, StarsD(ndx).r.Left, StarsD(ndx).r.Top, StarsD(ndx).r.Right, StarsD(ndx).r.Bottom)
             gr.FillEllipse(b, StarsD(ndx).r)
@@ -402,11 +436,11 @@ Public Class SatWindow
         dist = CInt(Fix(WSIZE * Math.Cos(azel.phi)))
 
         If VIEWSTEREO Then  ' sterographic projection
-            n = CInt(WSIZE * Math.Cos(azel.lambda) * Math.Tan((DefConst.PIO2 - azel.phi) / 2))
-            e = CInt(-WSIZE * Math.Sin(azel.lambda) * Math.Tan((DefConst.PIO2 - azel.phi) / 2))
+            n = CInt(WYFLIP * WSIZE * Math.Cos(azel.lambda) * Math.Tan((DefConst.PIO2 - azel.phi) / 2))
+            e = CInt(WXFLIP * WSIZE * Math.Sin(azel.lambda) * Math.Tan((DefConst.PIO2 - azel.phi) / 2))
         Else                ' This is a simple projection that compresses the area below 30 deg
-            n = CInt(Fix(dist * Math.Cos(azel.lambda)))
-            e = CInt(Fix(-dist * Math.Sin(azel.lambda)))
+            n = CInt(Fix(WYFLIP * dist * Math.Cos(azel.lambda)))
+            e = CInt(Fix(WXFLIP * dist * Math.Sin(azel.lambda)))
         End If
 
         ' stereographic projections from http://www2.arnes.si/~gljsentvid10/horizon.html
@@ -674,16 +708,16 @@ Public Class SatWindow
             End If
         Next
 
-        DrawChar(gr, 0, CInt(WSIZE * 1.02), "N")
-        DrawChar(gr, 0, -CInt(WSIZE * 1.02), "S")
-        DrawChar(gr, CInt(WSIZE * 1.02), 0, "W")
-        DrawChar(gr, -CInt(WSIZE * 1.02), 0, "E")
+        DrawChar(gr, 0, WYFLIP * CInt(WSIZE * 1.02), "N")
+        DrawChar(gr, 0, WXFLIP * CInt(WSIZE * 1.02), "S")
+        DrawChar(gr, WYFLIP * CInt(WSIZE * 1.02), 0, "W")
+        DrawChar(gr, WXFLIP * CInt(WSIZE * 1.02), 0, "E")
 
         gr.DrawRectangle(p, New Rectangle(-WSIZE, -WSIZE, WSIZE * 2, WSIZE * 2))
 
     End Sub
 
-    ' draw text at the x y coordinates
+    ' draw text at the x y coordinates (stops working if X axis is flipped?)
     Public Shared Sub DrawChar(ByVal gr As Graphics, ByVal X As Integer, ByVal Y As Integer, ByVal text As String, Optional ByVal scale As Double = 1)
         Dim b As New SolidBrush(gColor)
         Dim base As Integer = CInt(WSIZE * 0.01)    ' 1 percent of our drawing area
@@ -692,6 +726,7 @@ Public Class SatWindow
         Dim bmap As New Bitmap(base * 4, base * 4)
         bmap.MakeTransparent()
 
+        ' TODO - this breaks if the x or y axis is flipped (WXFLIP) because the text is no longer drawn within the bounds of the bitmap
         Dim gg As Graphics = Graphics.FromImage(bmap)
         Dim mx As New Matrix(Math.Sign(grMatrix.Elements(0)), 0, 0, Math.Sign(grMatrix.Elements(3)), 0, 0)
 

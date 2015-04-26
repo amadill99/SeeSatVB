@@ -305,6 +305,18 @@ Namespace My
                 Me("user_star_scale") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("10")>  _
+        Public Property user_sat_buffer() As Integer
+            Get
+                Return CType(Me("user_sat_buffer"),Integer)
+            End Get
+            Set
+                Me("user_sat_buffer") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

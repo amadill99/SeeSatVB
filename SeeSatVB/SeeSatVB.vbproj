@@ -123,6 +123,7 @@
     <Compile Include="ColourOpts.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="fov.vb" />
     <Compile Include="NTPClient.vb" />
     <Compile Include="Settings.Designer.vb">
       <DependentUpon>Settings.vb</DependentUpon>

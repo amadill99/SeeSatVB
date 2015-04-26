@@ -100,7 +100,7 @@ Public Class SatIO
 
     End Function
 
-    Private Shared Sub htmlColorToARGB(ByVal wcolor As String, ByRef colors() As Integer, Optional ByVal mag As Single = 4.0)
+    Friend Shared Sub htmlColorToARGB(ByVal wcolor As String, ByRef colors() As Integer, Optional ByVal mag As Single = 4.0)
         ' convert and possibly adjust html style color to ARGB values
         Dim tcolor As Color = ColorTranslator.FromHtml(wcolor)  'scratchpad
         If mag < 0 Then mag = 0
@@ -109,14 +109,14 @@ Public Class SatIO
         Dim bfactor As Double = 1.2 * Math.Exp(-0.2 * mag)
         'Dim bfactor As Double = 1
 
-        'CTRANSP = 1
+        'CTRANSP = 2
         'CBRIGHT = 1
 
         colors(0) = CInt(Math.Min(255, tcolor.A * CTRANSP * tfactor))
         colors(1) = CInt(Math.Min(255, tcolor.R * CBRIGHT * bfactor))
         colors(2) = CInt(Math.Min(255, tcolor.G * CBRIGHT * bfactor))
         colors(3) = CInt(Math.Min(255, tcolor.B * CBRIGHT * bfactor))
-        tcolor = Color.FromArgb(colors(0), colors(0), colors(0), colors(0))
+        tcolor = Color.FromArgb(colors(0), colors(1), colors(2), colors(3))
     End Sub
 
     Shared Function ReadMcname(ByVal fname As String, Optional ByVal clear As Boolean = False) As Integer

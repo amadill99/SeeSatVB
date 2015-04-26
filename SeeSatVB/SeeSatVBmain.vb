@@ -322,6 +322,7 @@ Public Class SeeSatVBmain
             OnStartUpToolStripMenuItem.Checked = True
             NTPTimeserver()
         End If
+        my_params.sat_buffer = My.Settings.user_sat_buffer
 
         PM_CheckToggle()
         TO_CheckToggle()
@@ -361,6 +362,7 @@ Public Class SeeSatVBmain
         My.Settings.user_star_int = my_params.star_time_int
         My.Settings.user_sat_int = my_params.sat_time_int
         My.Settings.user_ntp_onstart = my_params.ntp_onstart
+        My.Settings.user_sat_buffer = my_params.sat_buffer
 
         'visual settings
         My.Settings.user_view_stereo = my_params.view_stereo
@@ -583,7 +585,7 @@ Public Class SeeSatVBmain
         End If
 
         ' set the display buffer to 10 positions
-        SatWindow.sizeofSatI = 10
+        SatWindow.sizeofSatI = my_params.sat_buffer
         ' and initialize the display list
         SatWindow.initSatsD()
 
@@ -671,7 +673,7 @@ Public Class SeeSatVBmain
             ' transfer the position values - each time the satellite changes or change astrovb to look at the global vars 
             AstroGR.set_sat_xyz(satellites(sndx).pos)
             ' set the precession vectors for this satellite - again each time the satellite changes
-            AstroGR.inpre(satellites(sndx).tle.epoch * DefConst.MINPERDAY)
+            AstroGR.dircos.init_precess(satellites(sndx).tle.epoch * DefConst.MINPERDAY)
             ' compute a bunch of stuff - reset iflag to 1 if satellite changes
             ' rval can be 0 - sat below horizon, 1 - sat should be visable, 2 - sat more than 2 earth radii away
             iflag2 = 1
@@ -885,7 +887,7 @@ Public Class SeeSatVBmain
             ' transfer the position values - each time the satellite changes or change astrovb to look at the global vars 
             AstroGR.set_sat_xyz(satellites(satid).pos)
             ' set the precession vectors for this satellite - again each time the satellite changes
-            AstroGR.inpre(satellites(satid).tle.epoch * DefConst.MINPERDAY)
+            AstroGR.dircos.init_precess(satellites(satid).tle.epoch * DefConst.MINPERDAY)
             ' compute a bunch of stuff - reset iflag to 1 if satellite changes
             AstroGR.xyztop(iflag2, jd * DefConst.MINPERDAY, satid)
 
@@ -1419,6 +1421,7 @@ Public Class prog_params
     Public sat_limit As Boolean     'use the limiting mag on the sats
     Public sat_scale As Integer     'scaling factor for satellites - default 10
     Public star_scale As Integer    'scaling factor for stars - default 10
-    Public star_bright As Single    'brightness adjustment for stars 0 - 1
-    Public star_transp As Single    'transparency adjustment for stars 0 - 1
+    Public star_bright As Single    'brightness adjustment for stars 0 - 2+
+    Public star_transp As Single    'transparency adjustment for stars 0 - 2+
+    Public sat_buffer As Integer    'size of the buffer for previous sat positions
 End Class
