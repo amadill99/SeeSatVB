@@ -673,7 +673,7 @@ Public Class SeeSatVBmain
             ' transfer the position values - each time the satellite changes or change astrovb to look at the global vars 
             AstroGR.set_sat_xyz(satellites(sndx).pos)
             ' set the precession vectors for this satellite - again each time the satellite changes
-            AstroGR.dircos.init_precess(satellites(sndx).tle.epoch * DefConst.MINPERDAY)
+            AstroGR.dircos.init_dc(satellites(sndx).tle.epoch * DefConst.MINPERDAY)
             ' compute a bunch of stuff - reset iflag to 1 if satellite changes
             ' rval can be 0 - sat below horizon, 1 - sat should be visable, 2 - sat more than 2 earth radii away
             iflag2 = 1
@@ -887,7 +887,7 @@ Public Class SeeSatVBmain
             ' transfer the position values - each time the satellite changes or change astrovb to look at the global vars 
             AstroGR.set_sat_xyz(satellites(satid).pos)
             ' set the precession vectors for this satellite - again each time the satellite changes
-            AstroGR.dircos.init_precess(satellites(satid).tle.epoch * DefConst.MINPERDAY)
+            AstroGR.dircos.init_dc(satellites(satid).tle.epoch * DefConst.MINPERDAY)
             ' compute a bunch of stuff - reset iflag to 1 if satellite changes
             AstroGR.xyztop(iflag2, jd * DefConst.MINPERDAY, satid)
 

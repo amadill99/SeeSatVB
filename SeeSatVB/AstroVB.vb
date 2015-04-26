@@ -255,16 +255,23 @@ Public Class AstroGR
         '    Generate topocentric equatorial satellite coordinates by adding the
         '    topocentric coordinates of the geocenter to the geocentric satellite
         '    position.
-        l.x = sat.x - SeeSatVBmain.obs.xc * coslha
-        lh.x = l.x
-        ls.x = lh.x
-        l.y = sat.y - SeeSatVBmain.obs.xc * sinlha
-        lh.y = l.y
-        ls.y = lh.y
-        l.z = sat.z + SeeSatVBmain.obs.zg
-        lh.z = l.z
-        ls.z = lh.z
-        rho = Math.Sqrt(l.x * l.x + l.y * l.y + l.z * l.z)
+        l = sat.Clone()
+        l.x = l.x - SeeSatVBmain.obs.xc * coslha
+        l.y = l.y - SeeSatVBmain.obs.xc * sinlha
+        l.z = l.z + SeeSatVBmain.obs.zg
+        lh = l.Clone()
+        ls = l.Clone()
+        rho = l.rho()
+        'l.x = sat.x - SeeSatVBmain.obs.xc * coslha
+        'lh.x = l.x
+        'ls.x = lh.x
+        'l.y = sat.y - SeeSatVBmain.obs.xc * sinlha
+        'lh.y = l.y
+        'ls.y = lh.y
+        'l.z = sat.z + SeeSatVBmain.obs.zg
+        'lh.z = l.z
+        'ls.z = lh.z
+        'rho = Math.Sqrt(l.x * l.x + l.y * l.y + l.z * l.z)
 
         '    if to far away (2 earth radi) to be visible then return.  If it is close
         '    to the horizon it should get checked again soon.
@@ -284,8 +291,8 @@ Public Class AstroGR
         '    z-axis points to the zenith.  The required y-rotation is the
         '    complement of the latitude; we can get it by reversing the sine
         '    and cosine arguments to yrot().
-        AstroGR.zrot(lh, sinlha, coslha)
-        AstroGR.yrot(lh, SeeSatVBmain.obs.coslat, SeeSatVBmain.obs.sinlat)
+        lh.zrot(sinlha, coslha)
+        lh.yrot(SeeSatVBmain.obs.coslat, SeeSatVBmain.obs.sinlat)
 
         '      If elevation < 0, the satellite's coordinates are of no
         '    interest, so return immediately with a value of zero.  Otherwise,
@@ -295,71 +302,78 @@ Public Class AstroGR
             rval = 0
             'Else       ' continue on 
         End If
-            azel.phi = Math.Asin(lh.z / rho)
-            azel.lambda = AstroGR.fmod2p(Math.Atan2(lh.y, -lh.x))
-            azel.r = rho
 
-            '    Precess the topocentric equatorial coordinates to epoch REFEP,
-            '    compute right ascension & declination.
-            AstroGR.preces(l)
-            radec.r = rho
-            radec.phi = Math.Asin(l.z / rho)
-            radec.lambda = AstroGR.fmod2p(Math.Atan2(l.y, l.x))
+        azel.phi = Math.Asin(lh.z / rho)
+        azel.lambda = AstroGR.fmod2p(Math.Atan2(lh.y, -lh.x))
+        azel.r = rho
 
-            ' altitude, latitude, longitude
-            rho = Math.Sqrt(sat.x * sat.x + sat.y * sat.y + sat.z * sat.z)
-            g.x = sat.x / rho
-            g.y = sat.y / rho
-            g.z = sat.z / rho
-            latlon.r = rho - DefConst.MEAN_R
-            latlon.phi = Math.Asin(g.z)
-            temp = AstroGR.fmod2p(Math.Atan2(g.y, g.x) - lhaa + SeeSatVBmain.obs.lambda)
-            If temp > DefConst.PI Then
-                temp -= DefConst.TWOPI ' west lon. is negative
-            End If
-            latlon.lambda = temp
+        '    Precess the topocentric equatorial coordinates to epoch REFEP,
+        '    compute right ascension & declination.
+        'AstroGR.preces(l)
+        l.preces(dircos)
+        radec.r = rho
+        radec.phi = Math.Asin(l.z / rho)
+        radec.lambda = AstroGR.fmod2p(Math.Atan2(l.y, l.x))
 
-            '    Sun elevation at satellite.  Get sun position, rotate the
-            '    axes so the satellite is on the positive z-axis.  Sun elevation =
-            '    arc sin z.  Add dip of horizon due to height of satellite.
+        ' altitude, latitude, longitude
+        g = sat.Clone
+        g.unit_vector()
+        ' we still need rho
+        'rho = Math.Sqrt(sat.x * sat.x + sat.y * sat.y + sat.z * sat.z)
+        'g.x = sat.x / rho
+        'g.y = sat.y / rho
+        'g.z = sat.z / rho
+        latlon.r = g.rho() - DefConst.MEAN_R
+        latlon.phi = Math.Asin(g.z)
+        temp = AstroGR.fmod2p(Math.Atan2(g.y, g.x) - lhaa + SeeSatVBmain.obs.lambda)
+        If temp > DefConst.PI Then
+            temp -= DefConst.TWOPI ' west lon. is negative
+        End If
+        latlon.lambda = temp
 
-            AstroGR.sun(suneq, tp) ' suneq = xyz sun position
+        '    Sun elevation at satellite.  Get sun position, rotate the
+        '    axes so the satellite is on the positive z-axis.  Sun elevation =
+        '    arc sin z.  Add dip of horizon due to height of satellite.
 
-            ' copy sun coords
-            sunl.x = suneq.x
-            sunl.y = suneq.y
-            sunl.z = suneq.z
+        AstroGR.sun(suneq, tp) ' suneq = xyz sun position
 
-            ' make ls into a unit vector
-            rho = Math.Sqrt(ls.x * ls.x + ls.y * ls.y + ls.z * ls.z)
-            ls.x = ls.x / rho
-            ls.y = ls.y / rho
-            ls.z = ls.z / rho
+        ' copy sun coords - I like the new way
+        sunl = suneq.Clone
+        'sunl.x = suneq.x
+        'sunl.y = suneq.y
+        'sunl.z = suneq.z
 
-            ' do the rotation for the geocenter
-            temp = Math.Sqrt(1 - g.z * g.z) ' dist. to z axis
-            AstroGR.zrot(suneq, g.y / temp, g.x / temp)
-            AstroGR.yrot(suneq, temp, g.z)
+        ' make ls into a unit vector
+        ls.unit_vector()
+        'rho = Math.Sqrt(ls.x * ls.x + ls.y * ls.y + ls.z * ls.z)
+        'ls.x = ls.x / rho
+        'ls.y = ls.y / rho
+        'ls.z = ls.z / rho
 
-            ' the same for the topocenter
-            temp = Math.Sqrt(1 - ls.z * ls.z) ' dist. to z axis
-            AstroGR.zrot(sunl, ls.y / temp, ls.x / temp)
-            AstroGR.yrot(sunl, temp, ls.z)
-            phase = Math.Asin(sunl.z) + DefConst.PIO2
+        ' do the rotation for the geocenter
+        temp = Math.Sqrt(1 - g.z * g.z) ' dist. to z axis
+        suneq.zrot(g.y / temp, g.x / temp)
+        suneq.yrot(temp, g.z)
 
-            ' right here it was blowing up with negative square root 
-            ' latlon.r is < 0 and > -2
-            'temp = (Math.Asin(suneq.z) + Math.Atan(Math.Sqrt((2 + latlon.r) * latlon.r))) * DefConst.RA2DE
-            temp = (Math.Asin(suneq.z) + Math.Atan(Math.Sqrt(Math.Abs((2 + latlon.r)) * Math.Abs(latlon.r)))) * DefConst.RA2DE
+        ' the same for the topocenter
+        temp = Math.Sqrt(1 - ls.z * ls.z) ' dist. to z axis
+        sunl.zrot(ls.y / temp, ls.x / temp)
+        sunl.yrot(temp, ls.z)
+        phase = Math.Asin(sunl.z) + DefConst.PIO2
 
-            ' ensure temp truncates correctly when converted to int
-            If temp >= 0.0 Then
-                temp += 0.5
-            Else
-                temp -= 0.5
-            End If
+        ' right here it was blowing up with negative square root 
+        ' latlon.r is < 0 and > -2
+        'temp = (Math.Asin(suneq.z) + Math.Atan(Math.Sqrt((2 + latlon.r) * latlon.r))) * DefConst.RA2DE
+        temp = (Math.Asin(suneq.z) + Math.Atan(Math.Sqrt(Math.Abs((2 + latlon.r)) * Math.Abs(latlon.r)))) * DefConst.RA2DE
 
-            elsusa = CInt(Fix(temp))
+        ' ensure temp truncates correctly when converted to int
+        If temp >= 0.0 Then
+            temp += 0.5
+        Else
+            temp -= 0.5
+        End If
+
+        elsusa = CInt(Fix(temp))
         'End If
 
         save_values(sndx)
@@ -407,8 +421,8 @@ Public Class AstroGR
         AstroGR.sun(csun, ep) ' get sun's position
 
         ' point the positive z-axis at zenith
-        AstroGR.zrot(csun, Math.Sin(lst), Math.Cos(lst))
-        AstroGR.yrot(csun, SeeSatVBmain.obs.coslat, SeeSatVBmain.obs.sinlat)
+        csun.zrot(Math.Sin(lst), Math.Cos(lst))
+        csun.yrot(SeeSatVBmain.obs.coslat, SeeSatVBmain.obs.sinlat)
 
         elev = Math.Asin(csun.z) * DefConst.RA2DE
         '     If desired, the sun's azimuth (deg) can be found here with the
@@ -423,7 +437,7 @@ Public Class AstroGR
         Return (CInt(Fix(elev)))
     End Function
 
- 
+
     '==================================================================
     '	 (ep)
     '	double ep;          epoch
@@ -465,11 +479,11 @@ Public Class AstroGR
         '    coordinates of the ZENITH.  We are rotating its axes into a
         '    particular relationship with the satellite.
 
-        AstroGR.zrot(zenith, Math.Sin(radec.lambda), Math.Cos(radec.lambda))
+        zenith.zrot(Math.Sin(radec.lambda), Math.Cos(radec.lambda))
 
         '     Satellite y-coordinate == 0.  x & y of north pole == 0.
         '    y-rotate so the positive z-axis passes through satellite.
-        AstroGR.yrot(zenith, Math.Cos(radec.phi), Math.Sin(radec.phi))
+        zenith.yrot(Math.Cos(radec.phi), Math.Sin(radec.phi))
 
         '     The z-axis passes through the satellite.  The north pole
         '    has a y-coordinate of 0 and a negative x-coordinate.  The
@@ -616,52 +630,54 @@ Public Class AstroGR
         Return theta - temp * DefConst.TWOPI
     End Function
 
-    '==================================================================
-    ' changed to by ref ATM
-    '==================================================================
-    Public Shared Sub zrot(ByRef cor As xyz_t, ByVal sint As Double, ByVal cost As Double)
-        ' Z-rotates coordinate axes for "cor" by angle t, where "sint"
-        'and "cost" are the sine and cosine of t.
 
-        Dim tempx As Double
-        Dim tempy As Double
+    ' REPLACED by class methods
+    ''==================================================================
+    '' changed to by ref ATM
+    ''==================================================================
+    'Public Shared Sub zrot(ByRef cor As xyz_t, ByVal sint As Double, ByVal cost As Double)
+    '    ' Z-rotates coordinate axes for "cor" by angle t, where "sint"
+    '    'and "cost" are the sine and cosine of t.
 
-        tempx = cor.x * cost + cor.y * sint
-        tempy = cor.y * cost - cor.x * sint
-        cor.x = tempx
-        cor.y = tempy
-    End Sub
+    '    Dim tempx As Double
+    '    Dim tempy As Double
 
-    '==================================================================
-    ' similar to zrot(), except rotate about y axis
-    ' changed to by ref ATM
-    '==================================================================
-    Public Shared Sub yrot(ByRef cor As xyz_t, ByVal sint As Double, ByVal cost As Double)
-        Dim tempx As Double
-        Dim tempz As Double
-        tempz = cor.z * cost + cor.x * sint
-        tempx = cor.x * cost - cor.z * sint
-        cor.x = tempx
-        cor.z = tempz
-    End Sub
+    '    tempx = cor.x * cost + cor.y * sint
+    '    tempy = cor.y * cost - cor.x * sint
+    '    cor.x = tempx
+    '    cor.y = tempy
+    'End Sub
+
+    ''==================================================================
+    '' similar to zrot(), except rotate about y axis
+    '' changed to by ref ATM
+    ''==================================================================
+    'Public Shared Sub yrot(ByRef cor As xyz_t, ByVal sint As Double, ByVal cost As Double)
+    '    Dim tempx As Double
+    '    Dim tempz As Double
+    '    tempz = cor.z * cost + cor.x * sint
+    '    tempx = cor.x * cost - cor.z * sint
+    '    cor.x = tempx
+    '    cor.z = tempz
+    'End Sub
 
     '==================================================================
     ' Uses direction cosines "dircos" (external struct) to rotate axes of
     'struct "cor".
     ' changed to by ref ATM
     '==================================================================
-    Public Shared Sub preces(ByRef cor As xyz_t)
+    'Public Shared Sub preces(ByRef cor As xyz_t)
 
-        Dim tempx As Double
-        Dim tempy As Double
-        Dim tempz As Double
-        tempx = cor.x * dircos.xx + cor.y * dircos.yx + cor.z * dircos.zx
-        tempy = cor.x * dircos.xy + cor.y * dircos.yy + cor.z * dircos.zy
-        tempz = cor.x * dircos.xz + cor.y * dircos.yz + cor.z * dircos.zz
-        cor.x = tempx
-        cor.y = tempy
-        cor.z = tempz
-    End Sub
+    '    Dim tempx As Double
+    '    Dim tempy As Double
+    '    Dim tempz As Double
+    '    tempx = cor.x * dircos.xx + cor.y * dircos.yx + cor.z * dircos.zx
+    '    tempy = cor.x * dircos.xy + cor.y * dircos.yy + cor.z * dircos.zy
+    '    tempz = cor.x * dircos.xz + cor.y * dircos.yz + cor.z * dircos.zz
+    '    cor.x = tempx
+    '    cor.y = tempy
+    '    cor.z = tempz
+    'End Sub
 
     '  set up parameters for calcstar
     Public Shared Function initstar() As Integer
@@ -771,8 +787,8 @@ Public Class AstroGR
         AstroGR.sun(csun, ep) ' get sun's position
 
         ' point the positive z-axis at zenith
-        AstroGR.zrot(csun, Math.Sin(lst), Math.Cos(lst))
-        AstroGR.yrot(csun, SeeSatVBmain.obs.coslat, SeeSatVBmain.obs.sinlat)
+        csun.zrot(Math.Sin(lst), Math.Cos(lst))
+        csun.yrot(SeeSatVBmain.obs.coslat, SeeSatVBmain.obs.sinlat)
 
         sunxy.alt = Math.Asin(csun.z) '* DefConst.RA2DE
 
@@ -790,6 +806,7 @@ Public Class AstroGR
 
         Select Case sunxy.alt * DefConst.DE2RA
             Case Is < -18
+                SatIO.htmlColorToARGB("#350303", sunxy.colors, 8)
             Case -12 To -18
                 SatIO.htmlColorToARGB("#430303", sunxy.colors, 6)
             Case -6 To -12
@@ -1269,6 +1286,11 @@ Public Class xyz_t
         Return DirectCast(Me.MemberwiseClone(), xyz_t)
     End Function
 
+    Public Function rho() As Double
+        rho = Math.Sqrt(Me.x * Me.x + Me.y * Me.y + Me.z * Me.z)
+    End Function
+
+
     Public Sub add(b As xyz_t)
         Me.x += b.x
         Me.y += b.y
@@ -1312,7 +1334,7 @@ Public Class xyz_t
     Public Sub unit_vector()
         ' make xyz_t into a unit vector
         Dim rho As Double
-        rho = Math.Sqrt(Me.x * Me.x + Me.y * Me.y + Me.z * Me.z)
+        rho = Me.rho()
         Me.x = Me.x / rho
         Me.y = Me.y / rho
         Me.z = Me.z / rho
@@ -1382,9 +1404,9 @@ Public Class dircos_t
     Public zy As Double
     Public zz As Double
 
-    Public Sub init_precess(ByVal epoch As Double)
+    Public Sub init_dc(ByVal epoch As Double)
         ' Set up class "dircos" to precess from initial epoch "epoch" to final epoch
-        '"REFEP".  Used in conjunction with preces().  Formulae are the "rigorous
+        '"REFEP".  Used in conjunction with xyz_t.preces().  Formulae are the "rigorous
         'method" given by Meeus, which he in turn attributes to Newcomb.
         ' epoch is satellite epoch in julian days expressed in minutes
         ' SGP4class uses epoch julian days expressed in days
