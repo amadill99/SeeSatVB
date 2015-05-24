@@ -3,11 +3,11 @@
 Public Class FOV
     ' methods and properties for a field of view
     Private Shared polygon(12) As PointF   'the array of points defining the ellipse or arc beziers
-    Private Shared rotation As Double    'the orientation +/- 90 degrees
-    Private Shared altazm As New fov_t       'alt, azm, angle in radians
-    Private Shared radec As New fov_t        'ra, dec, angle in radians
-    Private Shared dimensions As New xyz_t   'x axis, y axis, angle in radians (y and z ignored if iscircle)
-    Private Shared iscircle As Boolean   'draw an ellipse instead of a rectangle
+    Public Shared rotation As Double    'the orientation +/- 90 degrees
+    Public Shared altazm As New fov_t       'alt, azm, angle in radians
+    Public Shared radec As New fov_t        'ra, dec, angle in radians
+    Public Shared dimensions As New xyz_t   'x axis, y axis, angle in radians (y and z ignored if iscircle)
+    Public Shared iscircle As Boolean   'draw an ellipse instead of a rectangle
     Public Shared show As Boolean       'show the fov
     Public Shared isdirty As Boolean    'needs to be refreshed
     Public Shared track As Boolean      'track with star field ie use ra/dec

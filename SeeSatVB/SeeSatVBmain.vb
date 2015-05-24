@@ -374,6 +374,20 @@ Public Class SeeSatVBmain
         My.Settings.user_star_bright = my_params.star_bright
         My.Settings.user_star_transp = my_params.star_transp
 
+        'FOV settings
+        My.Settings.user_fov_rotation = FOV.rotation * DefConst.RA2DE
+        My.Settings.user_fov_iscircle = FOV.iscircle
+        My.Settings.user_fov_track = FOV.track
+        My.Settings.user_fov_rotate = FOV.rotate
+        My.Settings.user_fov_useRA = FOV.useRA
+        My.Settings.user_fov_width = FOV.dimensions.x * DefConst.RA2DE
+        My.Settings.user_fov_height = FOV.dimensions.y * DefConst.RA2DE
+        My.Settings.user_fov_rotation = FOV.dimensions.z
+        My.Settings.user_fov_alt = FOV.altazm.alde * DefConst.RA2DE
+        My.Settings.user_fov_azm = FOV.altazm.azra * DefConst.RA2DE
+        My.Settings.user_fov_ra = FOV.radec.azra * DefConst.RA2DE
+        My.Settings.user_fov_dec = FOV.radec.alde * DefConst.RA2DE
+        
         My.Settings.Save()
 
     End Sub
