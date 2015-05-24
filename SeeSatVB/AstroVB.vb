@@ -1286,6 +1286,14 @@ Public Class xyz_t
         Return DirectCast(Me.MemberwiseClone(), xyz_t)
     End Function
 
+    Public Function Copy() As xyz_t
+        Dim mycopy As xyz_t = DirectCast(Me.MemberwiseClone(), xyz_t)
+        mycopy.x = Me.x
+        mycopy.y = Me.y
+        mycopy.z = Me.z
+        Return mycopy
+    End Function
+
     Public Function rho() As Double
         rho = Math.Sqrt(Me.x * Me.x + Me.y * Me.y + Me.z * Me.z)
     End Function
