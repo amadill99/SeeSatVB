@@ -937,8 +937,10 @@ Public Class SatWindow
 
                 End If
 
-            Else
+            ElseIf (Control.ModifierKeys = Keys.Alt) Then
+                fov.MouseXYtoFOV(mouse_xy_user)
 
+            Else
                 FindNearestSat(mouse_xy_user, sndx, distance)
                 If distance < mindist Then
                     SeeSatVBmain.TextBox1.AppendText(vbNewLine + SeeSatVBmain.satellites(sndx).tlename + " / " + SeeSatVBmain.satellites(sndx).tle0.satname + _
@@ -1095,7 +1097,7 @@ Public Class SatWindow
             Azm = -Math.Atan2(mXY.X, mXY.Y)
         End If
         If Azm < 0 Then
-            Azm += DefConst.PI * 2
+            Azm += DefConst.TWOPI
         End If
     End Sub
 

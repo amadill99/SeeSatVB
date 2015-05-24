@@ -7,11 +7,11 @@ Public Class FOV
     Private Shared altazm As New fov_t       'alt, azm, angle in radians
     Private Shared radec As New fov_t        'ra, dec, angle in radians
     Private Shared dimensions As New xyz_t   'x axis, y axis, angle in radians (y and z ignored if iscircle)
-    Private Shared ctl(6) As xyz_t          ' the control points for the FOV
     Private Shared iscircle As Boolean   'draw an ellipse instead of a rectangle
     Public Shared show As Boolean       'show the fov
     Public Shared isdirty As Boolean    'needs to be refreshed
     Public Shared track As Boolean      'track with star field ie use ra/dec
+    Public Shared useRA As Boolean      'use the radec instead of altazm
     Public Shared rotate As Boolean     'rotate the fov with azimuth - true for an equitorial mount
     Private Shared pen As Pen            'the pen we draw with
     Private Shared cosrot, sinrot, sinalt, cosalt, sinazm, cosazm As Double
@@ -21,25 +21,36 @@ Public Class FOV
         'set up the parameters
         pen = New Pen(SatWindow.gColor, SatWindow.sPen)
 
-        rotation = 0 * DefConst.DE2RA
-        iscircle = True
+        rotation = My.Settings.user_fov_rotation * DefConst.DE2RA
+        iscircle = My.Settings.user_fov_iscircle
         show = True
-        track = True
-        rotate = False
+        track = My.Settings.user_fov_track
+        rotate = My.Settings.user_fov_rotate
+        isdirty = True
+        useRA = My.Settings.user_fov_useRA
 
         ' for testing
         '80 mm lens
-        dimensions.x = 25 * DefConst.DE2RA
-        dimensions.y = 15 * DefConst.DE2RA
-        dimensions.z = rotation
+        dimensions.x = My.Settings.user_fov_width * DefConst.DE2RA
+        dimensions.y = My.Settings.user_fov_height * DefConst.DE2RA
+        dimensions.z = My.Settings.user_fov_rotation
         'arbitrary spot
-        altazm.alde = 20 * DefConst.DE2RA
-        altazm.azra = 45 * DefConst.DE2RA
+        altazm.alde = My.Settings.user_fov_alt * DefConst.DE2RA
+        altazm.azra = My.Settings.user_fov_azm * DefConst.DE2RA
         altazm.rot = 0
         'rigel
-        radec.azra = 78.634468 * DefConst.DE2RA
-        radec.alde = -8.201641 * DefConst.DE2RA
+        radec.azra = My.Settings.user_fov_ra * DefConst.DE2RA
+        radec.alde = My.Settings.user_fov_dec * DefConst.DE2RA
         radec.rot = 0
+
+        If useRA = True Then
+            radec2altazm()
+            If altazm.alde < 0 Then
+                pen.Color = SatWindow.darkColor
+            Else
+                pen.Color = SatWindow.gColor
+            End If
+        End If
 
         Return True
     End Function
@@ -50,13 +61,15 @@ Public Class FOV
         Dim work As New xyz_t
         Dim Z, deltaHgt, deltaWdth, deltaPhi, deltaLambda As Double
 
-        ' initialize the control points
-        work.x = 0
-        work.y = 0
-        work.z = 0
-        For ndx = 0 To ctl.Length - 1
-            ctl(ndx) = work.Copy
-        Next
+        If track = True Then
+            radec2altazm()
+        End If
+
+        If altazm.alde < 0 Then
+            pen.Color = SatWindow.darkColor
+        Else
+            pen.Color = SatWindow.gColor
+        End If
 
         sinalt = Math.Sin(DefConst.PIO2 - altazm.alde)
         cosalt = Math.Cos(DefConst.PIO2 - altazm.alde)
@@ -181,47 +194,6 @@ Public Class FOV
 
     End Sub
 
-    ' not used
-    Private Shared Sub arcCtlPts(ByVal p1 As Integer, ByVal pc As Integer, ByVal p4 As Integer, ByVal p2 As Integer, ByVal p3 As Integer)
-        ' from http://itc.ktu.lt/itc354/Riskus354.pdf
-        ' parameters to routine are references into the control pts array
-        ' calculates the bezier control points that aproximate an arc from p1 through pc to p4
-        ' NOT through pc but centered on pc :-p
-
-        Dim H, C, theta, R As Double
-
-        ' calculate the height and chord of the arc
-
-        If ctl(pc).y = 0 Then
-            H = ctl(pc).x - ctl(p1).x
-            C = ctl(p1).y * 2
-        Else
-            H = ctl(pc).y - ctl(p1).y
-            C = ctl(p1).x * 2
-        End If
-
-        If H <> 0 Then
-            ' theta is the angle between the tangent and the chord
-            R = (C ^ 2 + 4 * H ^ 2) / 8 * H
-            theta = 2 * Math.Asin(C / (2 * R))
-            ' now R becomes the distance between the origin and the centerpoint
-            R = Math.Sqrt((C / 2) ^ 2 + H ^ 2)
-
-            If ctl(pc).y = 0 Then
-                ctl(p2).x = ctl(p1).x + magic * R * Math.Sin(theta)
-                ctl(p2).y = ctl(p1).y + magic * R * Math.Cos(theta)
-                ctl(p3).x = ctl(p4).x - magic * R * Math.Sin(theta)
-                ctl(p3).y = ctl(p4).y - magic * R * Math.Cos(theta)
-            Else
-                ctl(p2).x = ctl(p1).x - magic * R * Math.Cos(theta)
-                ctl(p2).y = ctl(p1).y - magic * R * Math.Sin(theta)
-                ctl(p3).x = ctl(p4).x + magic * R * Math.Cos(theta)
-                ctl(p3).y = ctl(p4).y + magic * R * Math.Sin(theta)
-            End If
-            ' is it -
-        End If
-
-    End Sub
 
     Private Shared Sub Proj2Sphere(ByRef work As xyz_t, ByVal phi As Double, ByVal lambda As Double, ByVal Z As Double)
         ' 0 <= phi <= 2pi, 0 <= lambda <= pi
@@ -256,6 +228,7 @@ Public Class FOV
 
     End Sub
 
+    'not used
     Private Shared Function altazm2screenxy(ByVal alt As Double, ByVal azm As Double) As PointF
         ' return a drawing point from an alt azm
         Dim coord As New PointF
@@ -274,14 +247,43 @@ Public Class FOV
 
     End Function
 
+    Public Shared Sub MouseXYtoFOV(ByVal mXY As Point)
+        'called from satwindow alt mousedown event
+        'toggle the FOV on and off
+        If show = True Then
+            show = False
+        Else
+            If SatWindow.VIEWSTEREO Then
+                altazm.alde = -2 * Math.Atan(Math.Sqrt(mXY.X ^ 2 + mXY.Y ^ 2) / SatWindow.WSIZE) + DefConst.PIO2
+                altazm.azra = -Math.Atan2(mXY.X, mXY.Y)
+            Else
+                altazm.alde = Math.Acos(Math.Sqrt(mXY.X ^ 2 + mXY.Y ^ 2) / SatWindow.WSIZE)
+                altazm.azra = -Math.Atan2(mXY.X, mXY.Y)
+            End If
+            If altazm.azra < 0 Then
+                altazm.azra += DefConst.TWOPI
+            End If
+
+            If useRA Then
+                altazm2radec()
+            End If
+            show = True
+            isdirty = True
+        End If
+    End Sub
+
     Public Shared Sub draw(ByVal gr As Graphics)
         ' draw the fov on the screen
 
-        calc()
+        If track = True Or isdirty = True Then
+            calc()
+            isdirty = False
+        End If
 
-        gr.DrawBeziers(pen, polygon)
-        'gr.DrawLines(pen, polygon)
-
+        If show = True Then
+            gr.DrawBeziers(pen, polygon)
+            'gr.DrawLines(pen, polygon)
+        End If
     End Sub
 
     Private Shared Sub altazm2radec()

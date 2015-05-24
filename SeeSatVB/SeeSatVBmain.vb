@@ -1213,6 +1213,7 @@ Public Class SeeSatVBmain
     Private Sub StereoProjectionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles StereoProjectionToolStripMenuItem.Click
         my_params.view_stereo = StereoProjectionToolStripMenuItem.Checked
         SatWindow.VIEWSTEREO = StereoProjectionToolStripMenuItem.Checked
+        FOV.isdirty = True
     End Sub
 
     Private Sub FilterByMagToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FilterByMagToolStripMenuItem.Click

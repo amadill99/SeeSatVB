@@ -317,6 +317,138 @@ Namespace My
                 Me("user_sat_buffer") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("45")>  _
+        Public Property user_fov_alt() As Double
+            Get
+                Return CType(Me("user_fov_alt"),Double)
+            End Get
+            Set
+                Me("user_fov_alt") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("45")>  _
+        Public Property user_fov_azm() As Double
+            Get
+                Return CType(Me("user_fov_azm"),Double)
+            End Get
+            Set
+                Me("user_fov_azm") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property user_fov_rotate() As Boolean
+            Get
+                Return CType(Me("user_fov_rotate"),Boolean)
+            End Get
+            Set
+                Me("user_fov_rotate") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+        Public Property user_fov_rotation() As Double
+            Get
+                Return CType(Me("user_fov_rotation"),Double)
+            End Get
+            Set
+                Me("user_fov_rotation") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("78.634468")>  _
+        Public Property user_fov_ra() As Double
+            Get
+                Return CType(Me("user_fov_ra"),Double)
+            End Get
+            Set
+                Me("user_fov_ra") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("-8.201641")>  _
+        Public Property user_fov_dec() As Double
+            Get
+                Return CType(Me("user_fov_dec"),Double)
+            End Get
+            Set
+                Me("user_fov_dec") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("25")>  _
+        Public Property user_fov_width() As Double
+            Get
+                Return CType(Me("user_fov_width"),Double)
+            End Get
+            Set
+                Me("user_fov_width") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("15")>  _
+        Public Property user_fov_height() As Double
+            Get
+                Return CType(Me("user_fov_height"),Double)
+            End Get
+            Set
+                Me("user_fov_height") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property user_fov_track() As Boolean
+            Get
+                Return CType(Me("user_fov_track"),Boolean)
+            End Get
+            Set
+                Me("user_fov_track") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property user_fov_iscircle() As Boolean
+            Get
+                Return CType(Me("user_fov_iscircle"),Boolean)
+            End Get
+            Set
+                Me("user_fov_iscircle") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property user_fov_useRA() As Boolean
+            Get
+                Return CType(Me("user_fov_useRA"),Boolean)
+            End Get
+            Set
+                Me("user_fov_useRA") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

@@ -68,5 +68,38 @@
     <Setting Name="user_sat_buffer" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">10</Value>
     </Setting>
+    <Setting Name="user_fov_alt" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">45</Value>
+    </Setting>
+    <Setting Name="user_fov_azm" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">45</Value>
+    </Setting>
+    <Setting Name="user_fov_rotate" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="user_fov_rotation" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="user_fov_ra" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">78.634468</Value>
+    </Setting>
+    <Setting Name="user_fov_dec" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">-8.201641</Value>
+    </Setting>
+    <Setting Name="user_fov_width" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">25</Value>
+    </Setting>
+    <Setting Name="user_fov_height" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">15</Value>
+    </Setting>
+    <Setting Name="user_fov_track" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="user_fov_iscircle" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="user_fov_useRA" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
