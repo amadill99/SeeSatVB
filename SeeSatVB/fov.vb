@@ -23,13 +23,14 @@ Public Class FOV
 
         rotation = My.Settings.user_fov_rotation * DefConst.DE2RA
         iscircle = My.Settings.user_fov_iscircle
-        show = True
+        show = My.Settings.user_fov_show
         track = My.Settings.user_fov_track
         rotate = My.Settings.user_fov_rotate
         isdirty = True
         useRA = My.Settings.user_fov_useRA
 
         ' for testing
+
         '80 mm lens
         dimensions.x = My.Settings.user_fov_width * DefConst.DE2RA
         dimensions.y = My.Settings.user_fov_height * DefConst.DE2RA
@@ -45,11 +46,14 @@ Public Class FOV
 
         If useRA = True Then
             radec2altazm()
-            If altazm.alde < 0 Then
-                pen.Color = SatWindow.darkColor
-            Else
-                pen.Color = SatWindow.gColor
-            End If
+        Else
+            altazm2radec()
+        End If
+
+        If altazm.alde < 0 Then
+            pen.Color = SatWindow.darkColor
+        Else
+            pen.Color = SatWindow.gColor
         End If
 
         Return True
@@ -263,13 +267,15 @@ Public Class FOV
             If altazm.azra < 0 Then
                 altazm.azra += DefConst.TWOPI
             End If
-
-            If useRA Then
+            My.Settings.user_fov_alt = altazm.alde * DefConst.RA2DE
+            My.Settings.user_fov_azm = altazm.azra * DefConst.RA2DE
+            If useRA Or track Then
                 altazm2radec()
             End If
             show = True
             isdirty = True
         End If
+        My.Settings.user_fov_show = show
     End Sub
 
     Public Shared Sub draw(ByVal gr As Graphics)
@@ -288,10 +294,14 @@ Public Class FOV
 
     Private Shared Sub altazm2radec()
         AstroGR.AltAzmtoRaDec(altazm.alde, altazm.azra, radec.azra, radec.alde)
+        My.Settings.user_fov_ra = radec.azra * DefConst.RA2DE
+        My.Settings.user_fov_dec = radec.alde * DefConst.RA2DE
     End Sub
 
     Private Shared Sub radec2altazm()
         AstroGR.RaDecToAltAzm(radec.azra, radec.alde, altazm.alde, altazm.azra)
+        My.Settings.user_fov_alt = altazm.alde * DefConst.RA2DE
+        My.Settings.user_fov_azm = altazm.azra * DefConst.RA2DE
     End Sub
 
 End Class

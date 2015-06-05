@@ -3,9 +3,13 @@ Imports System.Globalization
 
 Public Class UserSettings
 
-    Public Shared HasChanged As Boolean = False     ' settings have changed 
+    Public Shared LocHasChanged As Boolean = False     'location settings have changed 
+    Public Shared FOVHasChanged As Boolean = False     'FOV settings have changed 
+
     Public Shared loc_lat, loc_lon, loc_elev, loc_tz As Double
     Public Shared loc_name As String
+
+    Public Shared fov_rotation, fov_azm, fov_alt, fov_ra, fov_dec, fov_width, fov_height, fov_temp_height As Double
 
     Private Shared fstyle As NumberStyles = NumberStyles.Float
     Private Shared iculture As CultureInfo = CultureInfo.InvariantCulture
@@ -29,6 +33,48 @@ Public Class UserSettings
         TBLName.Text = SeeSatVBmain.my_loc.loc_name              '= My.Settings.user_loc_name
         TBTZoffset.Text = SeeSatVBmain.my_loc.tz_offset.ToString(iculture)   '= My.Settings.user_tz
 
+        'FOV settings
+        fov_alt = My.Settings.user_fov_alt
+        fov_azm = My.Settings.user_fov_azm
+        fov_dec = My.Settings.user_fov_dec
+        fov_ra = My.Settings.user_fov_ra
+        fov_width = My.Settings.user_fov_width
+        fov_height = My.Settings.user_fov_height
+        fov_temp_height = fov_height
+        fov_rotation = My.Settings.user_fov_rotation
+
+        CBFOViscircle.Checked = My.Settings.user_fov_iscircle
+        CBFOVTrack.Checked = My.Settings.user_fov_track
+        CBFOVRotate.Checked = My.Settings.user_fov_rotate
+        RBFOVradec.Checked = My.Settings.user_fov_useRA
+        RBFOValtazm.Checked = Not My.Settings.user_fov_useRA
+        CBFOVShow.Checked = My.Settings.user_fov_show
+
+        TBFOVWidth.Text = fov_width.ToString(iculture)
+        TBFOVHeight.Text = fov_height.ToString(iculture)
+        TBFOVRotation.Text = fov_rotation.ToString(iculture)
+        TBFOVAlt.Text = fov_alt.ToString(iculture)
+        TBFOVAltDisp.Text = Parser.DecDegToDMSString(fov_alt)
+        TBFOVAzm.Text = fov_azm.ToString(iculture)
+        TBFOVAzmDisp.Text = Parser.DecDegToDMSString(fov_azm)
+        TBFOVRA.Text = fov_ra.ToString(iculture)
+        TBFOVRADisp.Text = Parser.DecDegToHrString(fov_ra)
+        TBFOVDec.Text = fov_dec.ToString(iculture)
+        TBFOVDecDisp.Text = Parser.DecDegToDMSString(fov_dec)
+
+        If CBFOViscircle.Checked = True Then
+            FOVcircleChanged()
+        End If
+
+        FOVpointmodeChanged()
+
+        Select Case SeeSatVBmain.SettingsTabNdx
+            Case "location"
+                TabControlSettings.SelectedTab = LocationTab
+            Case "fov"
+                TabControlSettings.SelectedTab = FOVTab
+        End Select
+
     End Sub
 
     Private Sub TBLat_Leave(sender As Object, e As EventArgs) Handles TBLat.Leave
@@ -36,7 +82,7 @@ Public Class UserSettings
         lat = Parser.ParseAll(TBLat.Text)
         TBLatDisp.Text = Parser.DecDegToDMSString(lat, "N")
         If lat <> SeeSatVBmain.my_loc.lat_deg Then
-            HasChanged = True
+            LocHasChanged = True
             loc_lat = lat
         End If
     End Sub
@@ -46,7 +92,7 @@ Public Class UserSettings
         lon = Parser.ParseAll(TBLong.Text)
         TBLongDisp.Text = Parser.DecDegToDMSString(lon, "E")
         If lon <> SeeSatVBmain.my_loc.lon_deg Then
-            HasChanged = True
+            LocHasChanged = True
             loc_lon = lon
         End If
     End Sub
@@ -58,7 +104,7 @@ Public Class UserSettings
         End If
         If Double.TryParse(TBElev.Text, elev) Then
             If elev <> SeeSatVBmain.my_loc.ht_in_meters Then
-                HasChanged = True
+                LocHasChanged = True
                 loc_elev = elev
             End If
         End If
@@ -71,7 +117,7 @@ Public Class UserSettings
         End If
         If Double.TryParse(TBTZoffset.Text, tz) OrElse CBool(TBTZoffset.Text.CompareTo("0")) Then
             If tz <> SeeSatVBmain.my_loc.ht_in_meters Then
-                HasChanged = True
+                LocHasChanged = True
                 loc_tz = tz
             End If
         End If
@@ -83,14 +129,159 @@ Public Class UserSettings
             Exit Sub
         End If
         If TBLName.Text <> SeeSatVBmain.my_loc.loc_name Then
-            HasChanged = True
+            LocHasChanged = True
             loc_name = TBLName.Text
         End If
     End Sub
 
 
-    Private Sub BExit_Click(sender As Object, e As EventArgs) Handles BExit.Click
-        If HasChanged Then
+
+    Private Sub CBFOV_Leave(sender As Object, e As EventArgs) Handles CBFOVShow.Leave, CBFOVTrack.Leave, CBFOVRotate.Leave
+        'check to see if the state has changed
+        If sender Is CBFOVShow And My.Settings.user_fov_show <> CBFOVShow.Checked Then
+            FOVHasChanged = True
+        End If
+        If sender Is CBFOVRotate And My.Settings.user_fov_rotate <> CBFOVRotate.Checked Then
+            FOVHasChanged = True
+        End If
+        If sender Is CBFOVTrack And My.Settings.user_fov_track <> CBFOVTrack.Checked Then
+            FOVHasChanged = True
+        End If
+    End Sub
+
+    Private Sub CBFOViscircle_Leave(sender As Object, e As EventArgs) Handles CBFOViscircle.Leave
+        If My.Settings.user_fov_iscircle <> CBFOViscircle.Checked Then
+            FOVHasChanged = True
+        End If
+        FOVcircleChanged()
+    End Sub
+
+    Private Sub CBFOViscircle_CheckedChanged(sender As Object, e As EventArgs) Handles CBFOViscircle.CheckedChanged
+        If sender Is CBFOViscircle Then
+            FOVcircleChanged()
+        End If
+    End Sub
+
+    Private Sub FOVcircleChanged()
+        If CBFOViscircle.Checked = True Then        'disable the height tb and set to the width
+            TBFOVHeight.Text = TBFOVWidth.Text
+            TBFOVHeight.Enabled = False
+            CBFOVRotate.Enabled = False
+            TBFOVRotation.Enabled = False
+            fov_temp_height = fov_height
+            fov_height = fov_width
+        Else                                        'restore the old setting
+            fov_height = fov_temp_height
+            TBFOVHeight.Enabled = True
+            CBFOVRotate.Enabled = True
+            TBFOVRotation.Enabled = True
+            TBFOVHeight.Text = fov_height.ToString(iculture)
+        End If
+    End Sub
+
+    Private Sub TBFOVWidth_Leave(sender As Object, e As EventArgs) Handles TBFOVWidth.Leave
+        Dim width As Double
+        If (String.IsNullOrWhiteSpace(TBFOVWidth.Text)) Then
+            Exit Sub
+        End If
+        If Double.TryParse(TBFOVWidth.Text, width) OrElse CBool(TBFOVWidth.Text.CompareTo("0")) Then
+            If width <> My.Settings.user_fov_width Then
+                FOVHasChanged = True
+                fov_width = width
+            End If
+        End If
+    End Sub
+
+    Private Sub TBFOVHeight_Leave(sender As Object, e As EventArgs) Handles TBFOVHeight.Leave
+        Dim height As Double
+        If (String.IsNullOrWhiteSpace(TBFOVHeight.Text)) Then
+            Exit Sub
+        End If
+        If Double.TryParse(TBFOVHeight.Text, height) OrElse CBool(TBFOVHeight.Text.CompareTo("0")) Then
+            If height <> My.Settings.user_fov_height Then
+                FOVHasChanged = True
+                fov_height = height
+            End If
+        End If
+    End Sub
+
+    Private Sub TBFOVRotation_Leave(sender As Object, e As EventArgs) Handles TBFOVRotation.Leave
+        Dim rotation As Double
+        If (String.IsNullOrWhiteSpace(TBFOVRotation.Text)) Then
+            Exit Sub
+        End If
+        If Double.TryParse(TBFOVRotation.Text, rotation) OrElse CBool(TBFOVRotation.Text.CompareTo("0")) Then
+            If rotation <> My.Settings.user_fov_rotation Then
+                FOVHasChanged = True
+                fov_rotation = rotation
+            End If
+        End If
+    End Sub
+
+    Private Sub FOVpointmodeChanged()
+        If RBFOValtazm.Checked = True Then
+            TBFOVRA.Enabled = False
+            TBFOVDec.Enabled = False
+            TBFOVAlt.Enabled = True
+            TBFOVAzm.Enabled = True
+        Else
+            TBFOVRA.Enabled = True
+            TBFOVDec.Enabled = True
+            TBFOVAlt.Enabled = False
+            TBFOVAzm.Enabled = False
+        End If
+    End Sub
+
+    Private Sub RBFOValtazm_CheckedChanged(sender As Object, e As EventArgs) Handles RBFOValtazm.CheckedChanged
+        FOVpointmodeChanged()
+    End Sub
+
+    Private Sub TBFOVAlt_Leave(sender As Object, e As EventArgs) Handles TBFOVAlt.Leave
+        Dim alt As Double
+        alt = Parser.ParseAll(TBFOVAlt.Text)
+        TBFOVAltDisp.Text = Parser.DecDegToDMSString(alt)
+        If alt <> My.Settings.user_fov_alt Then
+            FOVHasChanged = True
+            fov_alt = alt
+        End If
+    End Sub
+
+    Private Sub TBFOVAzm_Leave(sender As Object, e As EventArgs) Handles TBFOVAzm.Leave
+        Dim azm As Double
+        azm = Parser.ParseAll(TBFOVAzm.Text)
+        TBFOVAzmDisp.Text = Parser.DecDegToDMSString(azm)
+        If azm <> My.Settings.user_fov_azm Then
+            FOVHasChanged = True
+            fov_azm = azm
+        End If
+    End Sub
+
+    Private Sub TBFOVDec_Leave(sender As Object, e As EventArgs) Handles TBFOVDec.Leave
+        Dim dec As Double
+        dec = Parser.ParseAll(TBFOVDec.Text)
+        TBFOVDecDisp.Text = Parser.DecDegToDMSString(dec)
+        If dec <> My.Settings.user_fov_dec Then
+            FOVHasChanged = True
+            fov_dec = dec
+        End If
+    End Sub
+
+    Private Sub TBFOVRA_Leave(sender As Object, e As EventArgs) Handles TBFOVRA.Leave
+        Dim ra As Double
+        ra = Parser.ParseAll(TBFOVRA.Text)      ' lets try a dec degree, dm, dms pattern first
+        If ra = 0 Then
+            ra = Parser.ParseHrMinSec(TBFOVRA.Text) 'that didn't work so maybe they are using hms
+        End If
+
+        TBFOVRADisp.Text = Parser.DecDegToHrString(ra)
+        If ra <> My.Settings.user_fov_ra Then
+            FOVHasChanged = True
+            fov_ra = ra
+        End If
+    End Sub
+
+    Private Sub BExit_Click(sender As Object, e As EventArgs) Handles BLocExit.Click, BFOVExit.Click
+        If LocHasChanged Then
             SeeSatVBmain.my_loc.lat_deg = loc_lat
             SeeSatVBmain.my_loc.lat2rad()
 
@@ -106,9 +297,30 @@ Public Class UserSettings
             End If
         End If
 
+        If FOVHasChanged Then
+            My.Settings.user_fov_iscircle = CBFOViscircle.Checked
+            My.Settings.user_fov_track = CBFOVTrack.Checked
+            My.Settings.user_fov_rotate = CBFOVRotate.Checked
+            My.Settings.user_fov_useRA = RBFOVradec.Checked
+            My.Settings.user_fov_show = CBFOVShow.Checked
+
+            My.Settings.user_fov_rotation = fov_rotation
+            My.Settings.user_fov_width = fov_width
+            My.Settings.user_fov_height = fov_height
+            My.Settings.user_fov_alt = fov_alt
+            My.Settings.user_fov_azm = fov_azm
+            My.Settings.user_fov_ra = fov_ra
+            My.Settings.user_fov_dec = fov_dec
+
+            If SeeSatVBmain.REALTIME Then
+                FOV.initialize()
+            End If
+        End If
+
         Me.Dispose()
 
     End Sub
+
 End Class
 
 
@@ -190,11 +402,23 @@ Public Class Parser
         "[""\u2033\u201D]?\s*" + _
         "(?<Suf>[NSEW])?\s*$"
 
+    Public Const HrMinSecPattern As String = _
+        "^\s*" + _
+        "(?<Suf>[EW])?" + _
+        "(?<Hr>.+?)" + _
+        "[h\*\s]" + _
+        "(?<Min>.+?)" + _
+        "[M'\u2032\u2019\s]" + _
+        "(?<Sec>.+?)" + _
+        "[""\u2033\u201D]?\s*" + _
+        "(?<Suf>[NSEW])?\s*$"
+
     Private Const RegexOptions As RegexOptions = RegexOptions.Compiled Or RegexOptions.IgnorePatternWhitespace Or RegexOptions.IgnoreCase
 
     Private Shared DegRegex As New Regex(DegPattern, RegexOptions)
     Private Shared DegMinRegex As New Regex(DegMinPattern, RegexOptions)
     Private Shared DegMinSecRegex As New Regex(DegMinSecPattern, RegexOptions)
+    Private Shared HrMinSecRegex As New Regex(HrMinSecPattern, RegexOptions)
 
     Private Shared fstyle As NumberStyles = NumberStyles.Float
     Private Shared iculture As CultureInfo = CultureInfo.InvariantCulture
@@ -239,6 +463,21 @@ Public Class Parser
             Return Nothing
         End If
         Return Parse(value, DegMinSecRegex)
+    End Function
+
+    Public Shared Function ParseHrMinSec(value As String) As Double
+        If (String.IsNullOrWhiteSpace(value)) Then
+            Return Nothing
+        End If
+
+        Dim match As Match = HrMinSecRegex.Match(value.Replace(", ", " "))
+        If match.Success Then
+            Dim decDegrees As Double = ParseAngle(TryGetValue(match, "Suf"), TryGetValue(match, "Hr"), TryGetValue(match, "Min"), TryGetValue(match, "Sec"))
+            decDegrees *= 15
+            Return decDegrees
+        End If
+        Return Nothing
+
     End Function
 
     Friend Shared Function Parse(ByVal input As String, ByVal regex As Regex) As Double

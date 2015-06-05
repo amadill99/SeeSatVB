@@ -63,6 +63,7 @@ Partial Class SeeSatVBmain
         Me.LabelMin = New System.Windows.Forms.Label()
         Me.LabelSec = New System.Windows.Forms.Label()
         Me.GroupBoxTS = New System.Windows.Forms.GroupBox()
+        Me.FieldOfViewToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MenuStrip1.SuspendLayout()
         Me.GroupBoxTM.SuspendLayout()
         Me.GroupBoxPM.SuspendLayout()
@@ -173,7 +174,7 @@ Partial Class SeeSatVBmain
         '
         'OptionsToolStripMenuItem
         '
-        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserLocationToolStripMenuItem, Me.SetNTPTimeToolStripMenuItem, Me.VisualToolStripMenuItem, Me.SaveDefaultsToolStripMenuItem})
+        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.UserLocationToolStripMenuItem, Me.FieldOfViewToolStripMenuItem, Me.SetNTPTimeToolStripMenuItem, Me.VisualToolStripMenuItem, Me.SaveDefaultsToolStripMenuItem})
         Me.OptionsToolStripMenuItem.Name = "OptionsToolStripMenuItem"
         Me.OptionsToolStripMenuItem.Size = New System.Drawing.Size(61, 20)
         Me.OptionsToolStripMenuItem.Text = "Options"
@@ -194,14 +195,14 @@ Partial Class SeeSatVBmain
         'SetNowToolStripMenuItem
         '
         Me.SetNowToolStripMenuItem.Name = "SetNowToolStripMenuItem"
-        Me.SetNowToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
+        Me.SetNowToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.SetNowToolStripMenuItem.Text = "Set Now"
         '
         'OnStartUpToolStripMenuItem
         '
         Me.OnStartUpToolStripMenuItem.CheckOnClick = True
         Me.OnStartUpToolStripMenuItem.Name = "OnStartUpToolStripMenuItem"
-        Me.OnStartUpToolStripMenuItem.Size = New System.Drawing.Size(135, 22)
+        Me.OnStartUpToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
         Me.OnStartUpToolStripMenuItem.Text = "On Start Up"
         '
         'VisualToolStripMenuItem
@@ -347,6 +348,7 @@ Partial Class SeeSatVBmain
         '
         'NUpDownSec
         '
+        Me.NUpDownSec.Increment = New Decimal(New Integer() {11, 0, 0, 65536})
         Me.NUpDownSec.Location = New System.Drawing.Point(189, 37)
         Me.NUpDownSec.Maximum = New Decimal(New Integer() {60, 0, 0, 0})
         Me.NUpDownSec.Minimum = New Decimal(New Integer() {60, 0, 0, -2147483648})
@@ -397,6 +399,12 @@ Partial Class SeeSatVBmain
         Me.GroupBoxTS.Size = New System.Drawing.Size(246, 70)
         Me.GroupBoxTS.TabIndex = 19
         Me.GroupBoxTS.TabStop = False
+        '
+        'FieldOfViewToolStripMenuItem
+        '
+        Me.FieldOfViewToolStripMenuItem.Name = "FieldOfViewToolStripMenuItem"
+        Me.FieldOfViewToolStripMenuItem.Size = New System.Drawing.Size(161, 22)
+        Me.FieldOfViewToolStripMenuItem.Text = "Field of View"
         '
         'SeeSatVBmain
         '
@@ -469,5 +477,6 @@ Partial Class SeeSatVBmain
     Friend WithEvents VisualToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents StereoProjectionToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents FilterByMagToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents FieldOfViewToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class

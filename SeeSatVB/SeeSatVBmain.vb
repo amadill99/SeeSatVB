@@ -162,11 +162,13 @@ Public Class SeeSatVBmain
 
     Public Shared SYSCLOCKERR As Double = 0 ' system clock offset in msec from NTP time
 
-    Public Shared PMTOFFSET As Double = 0   ' predict mode offset time in decimal days
+    Public Shared PMTOFFSET As Decimal = 0   ' predict mode offset time in decimal days
 
     Public Shared TIMENOW As DateTime     ' the instant in time of our prediction run
 
     Private Shared dateChanged As Boolean = False   ' flag for datepickerrt
+
+    Private Shared userChanged As Boolean = False   ' flag for timeoffset controls
 
     ' ATLAS CENTAUR 2 
     'Dim tle1 As String = "1 00694U 63047A   14359.71852084  .00002470  00000-0  31909-3 0  6700"
@@ -290,6 +292,8 @@ Public Class SeeSatVBmain
 
     Public SXXP() As String = {"", "SGP4", "SGP8", "SDP4", "SDP8"}
 
+    Public Shared SettingsTabNdx As String = "location"     'for passing the active tab to the settings subform
+
     Public Sub New()
 
         ' This call is required by the designer.
@@ -387,6 +391,7 @@ Public Class SeeSatVBmain
         My.Settings.user_fov_azm = FOV.altazm.azra * DefConst.RA2DE
         My.Settings.user_fov_ra = FOV.radec.azra * DefConst.RA2DE
         My.Settings.user_fov_dec = FOV.radec.alde * DefConst.RA2DE
+        My.Settings.user_fov_show = FOV.show
         
         My.Settings.Save()
 
@@ -1006,10 +1011,6 @@ Public Class SeeSatVBmain
             "and changed intl_desig to model parameter " + satellites(ndx).tle.intl_desig
     End Sub
 
-    Private Sub SeeSatVBmain_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
-    End Sub
-
     Private Sub BSatWindow_Click(sender As Object, e As EventArgs) Handles BSatWindow.Click
 
         Dim frmCollection = System.Windows.Forms.Application.OpenForms
@@ -1204,6 +1205,7 @@ Public Class SeeSatVBmain
 
     Private Sub UserLocationToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles UserLocationToolStripMenuItem.Click
         'open the user location dialog
+        SettingsTabNdx = "location"
         Dim frmCollection = System.Windows.Forms.Application.OpenForms
         If frmCollection.OfType(Of UserSettings).Any Then
             frmCollection.Item("UserSettings").Activate()
@@ -1211,7 +1213,18 @@ Public Class SeeSatVBmain
             Dim UserSet As New UserSettings
             UserSet.ShowDialog(Me)
         End If
+    End Sub
 
+    Private Sub FieldOfViewToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FieldOfViewToolStripMenuItem.Click
+        'open the user location dialog
+        SettingsTabNdx = "fov"
+        Dim frmCollection = System.Windows.Forms.Application.OpenForms
+        If frmCollection.OfType(Of UserSettings).Any Then
+            frmCollection.Item("UserSettings").Activate()
+        Else
+            Dim UserSet As New UserSettings
+            UserSet.ShowDialog(Me)
+        End If
     End Sub
 
     Private Sub SetNowToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetNowToolStripMenuItem.Click
@@ -1234,51 +1247,74 @@ Public Class SeeSatVBmain
         my_params.sat_limit = FilterByMagToolStripMenuItem.Checked
     End Sub
 
-    Private Sub NUpDownSec_ValueChanged(sender As Object, e As EventArgs) Handles NUpDownSec.ValueChanged
 
-        If NUpDownSec.Value >= 60 Then
-            NUpDownSec.Value = 0
-            NUpDownMin.Value += 1
+    Private Sub NUpDownHr_ValueChanged(sender As Object, e As EventArgs) Handles NUpDownHr.ValueChanged
+        If userChanged = True Then
+            chkUpDownCounters()
         End If
-        If NUpDownSec.Value <= -60 Then
-            NUpDownSec.Value = 0
-            NUpDownMin.Value -= 1
+    End Sub
+
+    Private Sub NUpDownSec_ValueChanged(sender As Object, e As EventArgs) Handles NUpDownSec.ValueChanged
+        If userChanged = True Then
+            chkUpDownCounters()
         End If
     End Sub
 
     Private Sub NUpDownMin_ValueChanged(sender As Object, e As EventArgs) Handles NUpDownMin.ValueChanged
+        If userChanged = True Then
+            chkUpDownCounters()
+        End If
+    End Sub
 
-        'setPMTimeOffset()
-        If NUpDownMin.Value >= 60 Then
+    Private Sub chkUpDownCounters()
+
+        userChanged = False
+
+        setPMTimeOffset()
+
+        setUpDown_Values()
+
+        If NUpDownSec.Value > 59 Then
+            NUpDownSec.Value = 0
+            NUpDownMin.Value += 1
+        End If
+        If NUpDownSec.Value < -59 Then
+            NUpDownSec.Value = 0
+            NUpDownMin.Value -= 1
+        End If
+
+        If NUpDownMin.Value > 59 Then
             NUpDownMin.Value = 0
             If NUpDownHr.Value < NUpDownHr.Maximum Then
                 NUpDownHr.Value += 1
             End If
         End If
-        If NUpDownMin.Value <= -60 Then
+        If NUpDownMin.Value < -59 Then
             NUpDownMin.Value = 0
             If NUpDownHr.Value > NUpDownHr.Minimum Then
                 NUpDownHr.Value -= 1
             End If
         End If
+
+        userChanged = True
+
     End Sub
 
     Private Sub NUpDownHr_Leave(sender As Object, e As EventArgs) Handles NUpDownHr.Leave
-        setPMTimeOffset()
+        'chkUpDownCounters()
     End Sub
 
     Private Sub NUpDownMin_Leave(sender As Object, e As EventArgs) Handles NUpDownMin.Leave
-        setPMTimeOffset()
+        'chkUpDownCounters()
     End Sub
 
     Private Sub NUpDownSec_Leave(sender As Object, e As EventArgs) Handles NUpDownSec.Leave
-        setPMTimeOffset()
+        'chkUpDownCounters()
     End Sub
 
     ' recalculate and update up/down time selectors
     Private Sub setPMTimeOffset()
-        PMTOFFSET = NUpDownHr.Value / DefConst.HRPERDAY + NUpDownMin.Value / DefConst.MINPERDAY + NUpDownSec.Value / DefConst.SECPERDAY
-        setUpDown_Values()
+        PMTOFFSET = CDec(NUpDownHr.Value / DefConst.HRPERDAY + NUpDownMin.Value / DefConst.MINPERDAY + NUpDownSec.Value / DefConst.SECPERDAY)
         If CheckBoxUTC.Checked Then
             DateTimePickerST.Value = DateTime.UtcNow.AddDays(PMTOFFSET)
         Else
@@ -1287,9 +1323,11 @@ Public Class SeeSatVBmain
     End Sub
 
     Private Sub setUpDown_Values()
+        userChanged = False
         NUpDownHr.Value = CDec(Fix(PMTOFFSET * DefConst.HRPERDAY))
         NUpDownMin.Value = CDec(Fix((PMTOFFSET - NUpDownHr.Value / DefConst.HRPERDAY) * DefConst.MINPERDAY))
         NUpDownSec.Value = CDec(Fix((PMTOFFSET - NUpDownHr.Value / DefConst.HRPERDAY - NUpDownMin.Value / DefConst.MINPERDAY) * DefConst.SECPERDAY))
+        userChanged = True
     End Sub
 
     Private Sub RadioButtonPM_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButtonPM.CheckedChanged, RadioButtonRT.CheckedChanged
@@ -1348,7 +1386,7 @@ Public Class SeeSatVBmain
         If Not CheckBoxUTC.Checked Then
             TimeDiff = TimeDiff.Subtract(New TimeSpan(CInt(my_loc.tz_offset), 0, 0))
         End If
-        PMTOFFSET = TimeDiff.TotalDays
+        PMTOFFSET = CDec(TimeDiff.TotalDays)
         setUpDown_Values()
     End Sub
 
