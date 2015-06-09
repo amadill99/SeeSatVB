@@ -34,7 +34,7 @@ Public Class FOV
         '80 mm lens
         dimensions.x = My.Settings.user_fov_width * DefConst.DE2RA
         dimensions.y = My.Settings.user_fov_height * DefConst.DE2RA
-        dimensions.z = My.Settings.user_fov_rotation
+        dimensions.z = My.Settings.user_fov_rotation * DefConst.DE2RA
         'arbitrary spot
         altazm.alde = My.Settings.user_fov_alt * DefConst.DE2RA
         altazm.azra = My.Settings.user_fov_azm * DefConst.DE2RA

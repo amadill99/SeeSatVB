@@ -1320,6 +1320,7 @@ Public Class SeeSatVBmain
         Else
             DateTimePickerST.Value = DateTime.Now.AddDays(PMTOFFSET)
         End If
+        FOV.isdirty = True
     End Sub
 
     Private Sub setUpDown_Values()

@@ -953,6 +953,9 @@ Public Class SatWindow
                         " Dist: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.azel.r * DefConst.EARTHR2KM, 1)) + " km" + vbNewLine)
                     SeeSatVBmain.TextBox1.AppendText(" RA: " + Parser.DecDegToHrString(SeeSatVBmain.satellites(sndx).view.radec.lambda * DefConst.RA2DE, "", 0) + _
                         " Dec: " + Parser.DecDegToDMSString(SeeSatVBmain.satellites(sndx).view.radec.phi * DefConst.RA2DE, "N", 0))
+                    SeeSatVBmain.TextBox1.AppendText(vbNewLine + " Lat: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.latlon.phi * DefConst.RA2DE, 4)) + _
+                        " Long: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.latlon.lambda * DefConst.RA2DE, 4)) + _
+                        " Alt: " + CStr(Math.Round(SeeSatVBmain.satellites(sndx).view.latlon.r * DefConst.EARTHR2KM, 1)) + " km" + vbNewLine)
                     SeeSatVBmain.TextBox1.AppendText(" Sun angle: " + CStr(SeeSatVBmain.satellites(sndx).view.elsusa) + " Illum: " + _
                         CStr(CInt(SeeSatVBmain.satellites(sndx).view.illum * 100)) + "% Mag: " + CStr(SeeSatVBmain.satellites(sndx).view.truemag) + _
                         SeeSatVBmain.satellites(sndx).tle0.magflg + vbNewLine)

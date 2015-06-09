@@ -323,7 +323,7 @@ Public Class AstroGR
         'g.x = sat.x / rho
         'g.y = sat.y / rho
         'g.z = sat.z / rho
-        latlon.r = g.rho() - DefConst.MEAN_R
+        latlon.r = sat.rho() - DefConst.MEAN_R
         latlon.phi = Math.Asin(g.z)
         temp = AstroGR.fmod2p(Math.Atan2(g.y, g.x) - lhaa + SeeSatVBmain.obs.lambda)
         If temp > DefConst.PI Then
